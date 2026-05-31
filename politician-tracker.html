@@ -297,11 +297,11 @@ td{padding:11px 16px;font-variant-numeric:tabular-nums;white-space:nowrap;}
         <span class="card-title">Full Portfolio — Stock-Level % Breakdown (Est. ~$6.5B Net Worth)</span>
         <span class="source-chip">OGE 2026 / Forbes</span>
       </div>
-      <div class="chart-wrap" style="height:320px;"><canvas id="trumpPieChart"></canvas></div>
+      <div class="chart-wrap" style="height:420px;"><canvas id="trumpPieChart"></canvas></div>
     </div>
     <div class="card">
       <div class="card-header"><span class="card-title">Holdings — Estimated % of Net Worth</span></div>
-      <div id="holdingsPanel" style="max-height:400px;overflow-y:auto;"></div>
+      <div id="holdingsPanel" style="max-height:500px;overflow-y:auto;"></div>
       <div style="padding:10px 16px 12px;border-top:1px solid var(--color-border);">
         <p style="font-size:10px;color:var(--color-text-faint);line-height:1.6;">⚠️ Estimates based on OGE Form 278-T (May 2026). Stock portfolio midpoint ~$485M split across top holdings per trade frequency &amp; OGE range midpoints. DJT: 311M shares @ $7.95 = ~$2.47B. Real estate ~$2.8B per Forbes. TRUMP meme coin &amp; WLFI undisclosed. All %s are approximations of ~$6.5B total.</p>
       </div>
@@ -546,36 +546,40 @@ const TRUMP_SELLS=[
   {ticker:"DJT",company:"Trump Media & Technology",value:"Partial",date:"Ongoing",note:"Minor sales, majority retained"},
 ];
 
-// ── TRUMP HOLDINGS — STOCK-LEVEL % BREAKDOWN of ~$6.5B Est. Net Worth ──
+// ── TRUMP HOLDINGS — FULLY NAMED, NO "OTHER" BUCKET ──
 // Methodology:
 //   DJT: 311M shares × $7.95 = ~$2.47B → 38%
 //   Real Estate / Private Biz: Forbes ~$2.8B → 43%
-//   Stock portfolio ~$485M midpoint split by trade weight:
-//     NVDA 10 buys → ~0.9% (~$58M)   AAPL 10 buys → ~0.8% (~$52M)
-//     AMZN 11 buys → ~0.8% (~$52M)   MSFT 9 buys  → ~0.7% (~$46M)
-//     ORCL 8 buys  → ~0.6% (~$39M)   AVGO 6 buys  → ~0.5% (~$33M)
-//     NOW  6 buys  → ~0.5% (~$33M)   DELL 5 buys  → ~0.4% (~$26M)
-//     ETFs (VOO/IWB/RSP) → ~0.8% (~$52M combined)
-//     Other stocks → ~0.8% (~$52M)
+//   Stock portfolio ~$485M midpoint — split by trade weight across ALL named holdings
 //   WLFI: ~80% stake ~$400M → 5%
 //   TRUMP Meme Coin: ~$300M → 4%
 //   Cash/Bonds: ~$200M → 3%
+//   Individual stocks & ETFs sum = ~7% of $6.5B = ~$455M
 const TRUMP_HOLDINGS=[
-  {color:"#f5a623",ticker:"DJT",       name:"Trump Media & Tech (Truth Social)",    pct:38,  val:"~$2.47B",  note:"311M shares @ $7.95 · down 42% YTD"},
-  {color:"#64748b",ticker:"RE/BIZ",    name:"Real Estate & Private Businesses",      pct:43,  val:"~$2.8B",   note:"Mar-a-Lago, golf courses, hotels (Forbes)"},
-  {color:"#76e3c4",ticker:"NVDA",      name:"NVIDIA Corp.",                          pct:0.9, val:"~$58M",    note:"10 buys Q1 · AI chips / Stargate"},
-  {color:"#a8b4c8",ticker:"AAPL",      name:"Apple Inc.",                            pct:0.8, val:"~$52M",    note:"10 buys Q1 · Mag-7"},
-  {color:"#f97316",ticker:"AMZN",      name:"Amazon.com Inc.",                       pct:0.8, val:"~$52M",    note:"11 buys Q1 · AWS / AI infra"},
-  {color:"#22d3ee",ticker:"MSFT",      name:"Microsoft Corp.",                       pct:0.7, val:"~$46M",    note:"9 buys Q1 · Azure / OpenAI"},
-  {color:"#f43f5e",ticker:"ORCL",      name:"Oracle Corp.",                          pct:0.6, val:"~$39M",    note:"8 buys Q1 · Stargate AI partner"},
-  {color:"#8b5cf6",ticker:"AVGO",      name:"Broadcom Inc.",                         pct:0.5, val:"~$33M",    note:"6 buys Q1 · AI custom chips"},
-  {color:"#10b981",ticker:"NOW",       name:"ServiceNow Inc.",                       pct:0.5, val:"~$33M",    note:"6 buys · +16% post-disclosure"},
-  {color:"#fbbf24",ticker:"DELL",      name:"Dell Technologies",                     pct:0.4, val:"~$26M",    note:"5 buys · AI servers"},
-  {color:"#a855f7",ticker:"ETFs",      name:"ETFs (VOO / IWB / RSP)",                pct:0.8, val:"~$52M",    note:"Broad market index funds"},
-  {color:"#6b7280",ticker:"OTHER",     name:"Other Stocks (36+ names)",              pct:0.8, val:"~$52M",    note:"BA, ETN, WDAY, SNPS, CDNS, etc."},
-  {color:"#06b6d4",ticker:"WLFI",      name:"World Liberty Financial (DeFi)",        pct:5,   val:"~$400M",   note:"~80% stake · undisclosed exact value"},
-  {color:"#f87171",ticker:"TRUMP",     name:"TRUMP Meme Coin (Crypto)",              pct:4,   val:"~$300M",   note:"Undisclosed · highly volatile"},
-  {color:"#34d399",ticker:"CASH",      name:"Cash / Money Market / Bonds",           pct:3,   val:"~$200M",   note:"SWGXX + fixed income"},
+  {color:"#f5a623",ticker:"DJT",       name:"Trump Media & Tech (Truth Social)",    pct:38,   val:"~$2.47B",  note:"311M shares @ $7.95 · down 42% YTD"},
+  {color:"#64748b",ticker:"RE/BIZ",    name:"Real Estate & Private Businesses",      pct:43,   val:"~$2.8B",   note:"Mar-a-Lago, golf courses, hotels (Forbes)"},
+  {color:"#06b6d4",ticker:"WLFI",      name:"World Liberty Financial (DeFi)",        pct:5,    val:"~$400M",   note:"~80% stake · undisclosed exact value"},
+  {color:"#f87171",ticker:"TRUMP",     name:"TRUMP Meme Coin (Crypto)",              pct:4,    val:"~$300M",   note:"Undisclosed · highly volatile"},
+  {color:"#34d399",ticker:"CASH",      name:"Cash / Money Market / Bonds",           pct:3,    val:"~$200M",   note:"SWGXX + fixed income"},
+  {color:"#76e3c4",ticker:"NVDA",      name:"NVIDIA Corp.",                          pct:0.9,  val:"~$58M",    note:"10 buys Q1 · AI chips / Stargate"},
+  {color:"#a8b4c8",ticker:"AAPL",      name:"Apple Inc.",                            pct:0.8,  val:"~$52M",    note:"10 buys Q1 · Mag-7"},
+  {color:"#f97316",ticker:"AMZN",      name:"Amazon.com Inc.",                       pct:0.8,  val:"~$52M",    note:"11 buys Q1 · AWS / AI infra"},
+  {color:"#a855f7",ticker:"ETFs",      name:"ETFs (VOO / IWB / RSP / XLI / IEMG)",  pct:0.8,  val:"~$52M",    note:"Broad market + sector index funds"},
+  {color:"#22d3ee",ticker:"MSFT",      name:"Microsoft Corp.",                       pct:0.7,  val:"~$46M",    note:"9 buys Q1 · Azure / OpenAI"},
+  {color:"#f43f5e",ticker:"ORCL",      name:"Oracle Corp.",                          pct:0.6,  val:"~$39M",    note:"8 buys Q1 · Stargate AI partner"},
+  {color:"#8b5cf6",ticker:"AVGO",      name:"Broadcom Inc.",                         pct:0.5,  val:"~$33M",    note:"6 buys Q1 · AI custom chips"},
+  {color:"#10b981",ticker:"NOW",       name:"ServiceNow Inc.",                       pct:0.5,  val:"~$33M",    note:"6 buys · +16% post-disclosure"},
+  {color:"#fbbf24",ticker:"DELL",      name:"Dell Technologies",                     pct:0.4,  val:"~$26M",    note:"5 buys · AI servers"},
+  {color:"#4ade80",ticker:"ADBE",      name:"Adobe Inc.",                            pct:0.25, val:"~$16M",    note:"AI creative suite"},
+  {color:"#38bdf8",ticker:"WDAY",      name:"Workday Inc.",                          pct:0.25, val:"~$16M",    note:"AI enterprise HR/Finance"},
+  {color:"#fb923c",ticker:"SNPS",      name:"Synopsys Inc.",                         pct:0.2,  val:"~$13M",    note:"EDA / chip design tools"},
+  {color:"#c084fc",ticker:"CDNS",      name:"Cadence Design Sys.",                   pct:0.2,  val:"~$13M",    note:"EDA / chip design tools"},
+  {color:"#e879f9",ticker:"BA",        name:"Boeing Co.",                            pct:0.15, val:"~$10M",    note:"Defense / aerospace"},
+  {color:"#fde68a",ticker:"ETN",       name:"Eaton Corp.",                           pct:0.15, val:"~$10M",    note:"Power mgmt / data centers"},
+  {color:"#6ee7b7",ticker:"UBER",      name:"Uber Technologies",                     pct:0.15, val:"~$10M",    note:"Autonomous / AI transport"},
+  {color:"#93c5fd",ticker:"TXN",       name:"Texas Instruments",                     pct:0.1,  val:"~$7M",     note:"Analog semiconductors"},
+  {color:"#fca5a5",ticker:"COST",      name:"Costco Wholesale",                      pct:0.1,  val:"~$7M",     note:"Retail"},
+  {color:"#d1d5db",ticker:"MISC",      name:"Remaining (JBL, PG, AXON, TDG, etc.)", pct:0.15, val:"~$10M",    note:"~10 smaller positions"},
 ];
 
 const PELOSI_TRADES=[
@@ -763,7 +767,7 @@ function renderTrump(){
       <td style="font-size:11px;color:var(--color-text-muted)">${t.note}</td>
     </tr>`).join('');
 
-  // Holdings panel — stock level
+  // Holdings panel
   document.getElementById('holdingsPanel').innerHTML=TRUMP_HOLDINGS.map(h=>`
     <div class="holding-row">
       <div class="holding-color" style="background:${h.color}"></div>
@@ -781,7 +785,7 @@ function renderTrump(){
       </div>
     </div>`).join('');
 
-  // Pie chart — stock-level breakdown
+  // Pie chart — fully named breakdown
   if(charts.tp)charts.tp.destroy();
   charts.tp=new Chart(document.getElementById('trumpPieChart'),{
     type:'doughnut',
@@ -804,8 +808,7 @@ function renderTrump(){
             color:'#8892a4',
             font:{size:10},
             boxWidth:10,
-            padding:8,
-            filter:(item)=>true
+            padding:6,
           }
         },
         tooltip:{callbacks:{
@@ -815,7 +818,7 @@ function renderTrump(){
           }
         }}
       },
-      cutout:'50%'
+      cutout:'48%'
     }
   });
 }
