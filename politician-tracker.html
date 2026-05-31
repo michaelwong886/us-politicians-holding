@@ -308,7 +308,6 @@ td{padding:11px 16px;font-variant-numeric:tabular-nums;white-space:nowrap;}
     </div>
   </div>
 
-  <!-- BUYS section -->
   <div class="card" style="margin-bottom:16px;">
     <div class="card-header">
       <span class="card-title">✅ Q1 2026 — $1M+ Purchases (36 Trades · OGE 278-T)</span>
@@ -329,7 +328,6 @@ td{padding:11px 16px;font-variant-numeric:tabular-nums;white-space:nowrap;}
     </div>
   </div>
 
-  <!-- SELLS section -->
   <div class="card">
     <div class="card-header">
       <span class="card-title">🔴 Q1 2026 — Major Sales (OGE 278-T)</span>
@@ -350,14 +348,32 @@ td{padding:11px 16px;font-variant-numeric:tabular-nums;white-space:nowrap;}
     <div class="trump-avatar" style="background:linear-gradient(135deg,#3b82f6,#6366f1);">👩‍⚖️</div>
     <div class="trump-info">
       <h2>Nancy Pelosi — House Representative (D-CA)</h2>
-      <p>STOCK Act PTR filings · 2025–2026 · AI-focused portfolio · Sources: InsiderFinance, Motley Fool</p>
+      <p>STOCK Act PTR filings · 2025–2026 · AI-focused portfolio · Sources: InsiderFinance, Motley Fool, House Disclosures</p>
     </div>
     <div class="trump-stats">
       <div class="trump-stat"><div class="val" style="color:var(--color-buy)">~87%</div><div class="lbl">Win Rate</div></div>
-      <div class="trump-stat"><div class="val" style="color:var(--color-primary)">AI</div><div class="lbl">Focus Sector</div></div>
+      <div class="trump-stat"><div class="val" style="color:var(--color-primary)">AI/Tech</div><div class="lbl">Focus Sector</div></div>
       <div class="trump-stat"><div class="val" style="color:var(--color-gold)">$100M+</div><div class="lbl">Est. Net Worth</div></div>
     </div>
   </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Portfolio — Stock-Level % Breakdown (Est. ~$100M+ Net Worth)</span>
+        <span class="source-chip">PTR Filings / InsiderFinance</span>
+      </div>
+      <div class="chart-wrap" style="height:420px;"><canvas id="pelosiPieChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Holdings — Estimated % of Portfolio</span></div>
+      <div id="pelosiHoldingsPanel" style="max-height:500px;overflow-y:auto;"></div>
+      <div style="padding:10px 16px 12px;border-top:1px solid var(--color-border);">
+        <p style="font-size:10px;color:var(--color-text-faint);line-height:1.6;">⚠️ Estimates based on PTR filings (House Disclosures 2024–2026). Portfolio heavily weighted to tech via stock + call options. Real estate (San Francisco, Napa Valley) estimated ~$40M+. All %s approximate of ~$100M+ total disclosed portfolio.</p>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-header"><span class="card-title">Pelosi 2025–2026 Trades (Options &amp; Stocks)</span><span class="source-chip">PTR Filings</span></div>
     <div class="table-wrap">
@@ -497,7 +513,6 @@ const CONGRESS_TRADES=[
   {rep:"Byron Donalds",party:"R",chamber:"Representatives",state:"FL",ticker:"NOW",type:"Purchase",range:"$15,001–$50,000",tradeDate:"2026-05-10",filed:"2026-05-24"},
 ];
 
-// Trump Q1 2026 OGE Buys
 const TRUMP_BUYS=[
   {ticker:"NVDA",company:"NVIDIA Corp.",tag:"ai",value:"$1M–$5M",date:"2026-02-10",note:"AI chips / Stargate"},
   {ticker:"AAPL",company:"Apple Inc.",tag:"ai",value:"$1M–$5M",date:"2026-03-02",note:"Mag-7 accumulation"},
@@ -546,15 +561,6 @@ const TRUMP_SELLS=[
   {ticker:"DJT",company:"Trump Media & Technology",value:"Partial",date:"Ongoing",note:"Minor sales, majority retained"},
 ];
 
-// ── TRUMP HOLDINGS — FULLY NAMED, NO "OTHER" BUCKET ──
-// Methodology:
-//   DJT: 311M shares × $7.95 = ~$2.47B → 38%
-//   Real Estate / Private Biz: Forbes ~$2.8B → 43%
-//   Stock portfolio ~$485M midpoint — split by trade weight across ALL named holdings
-//   WLFI: ~80% stake ~$400M → 5%
-//   TRUMP Meme Coin: ~$300M → 4%
-//   Cash/Bonds: ~$200M → 3%
-//   Individual stocks & ETFs sum = ~7% of $6.5B = ~$455M
 const TRUMP_HOLDINGS=[
   {color:"#f5a623",ticker:"DJT",       name:"Trump Media & Tech (Truth Social)",    pct:38,   val:"~$2.47B",  note:"311M shares @ $7.95 · down 42% YTD"},
   {color:"#64748b",ticker:"RE/BIZ",    name:"Real Estate & Private Businesses",      pct:43,   val:"~$2.8B",   note:"Mar-a-Lago, golf courses, hotels (Forbes)"},
@@ -580,6 +586,32 @@ const TRUMP_HOLDINGS=[
   {color:"#93c5fd",ticker:"TXN",       name:"Texas Instruments",                     pct:0.1,  val:"~$7M",     note:"Analog semiconductors"},
   {color:"#fca5a5",ticker:"COST",      name:"Costco Wholesale",                      pct:0.1,  val:"~$7M",     note:"Retail"},
   {color:"#d1d5db",ticker:"MISC",      name:"Remaining (JBL, PG, AXON, TDG, etc.)", pct:0.15, val:"~$10M",    note:"~10 smaller positions"},
+];
+
+// ── PELOSI HOLDINGS ──
+// Methodology:
+//   Real Estate (SF + Napa): ~$40M → 36%
+//   NVDA (stock + call options): heavy position → 18%
+//   AAPL (call options): long-term → 10%
+//   GOOGL (stock + calls): 8%
+//   AMZN (stock): 6%
+//   MSFT (calls, partially sold): 5%
+//   CRM (calls): 3%
+//   AllianceBernstein / funds: 4%
+//   Cash / bonds: 5%
+//   Other tech/options: 5%
+const PELOSI_HOLDINGS=[
+  {color:"#64748b",ticker:"RE",        name:"Real Estate (SF + Napa Valley)",        pct:36,   val:"~$40M+",   note:"Pacific Heights, Napa vineyard"},
+  {color:"#76e3c4",ticker:"NVDA",      name:"NVIDIA Corp. (Stock + Calls)",          pct:18,   val:"~$20M",    note:"Most traded · AI chips · call options"},
+  {color:"#a8b4c8",ticker:"AAPL",      name:"Apple Inc. (Call Options)",             pct:10,   val:"~$11M",    note:"Long-dated call options · Nov 2025 filing"},
+  {color:"#4f8ef7",ticker:"GOOGL",     name:"Alphabet Inc. (Stock + Calls)",         pct:8,    val:"~$9M",     note:"AI / cloud · Jan 2026 purchase"},
+  {color:"#f97316",ticker:"AMZN",      name:"Amazon.com Inc.",                       pct:6,    val:"~$7M",     note:"AWS / AI infra · Jan 2026 purchase"},
+  {color:"#22d3ee",ticker:"MSFT",      name:"Microsoft Corp. (Call Options)",        pct:5,    val:"~$6M",     note:"Partially sold Jan 2026 · $1M–$5M sale"},
+  {color:"#34d399",ticker:"CASH",      name:"Cash / Fixed Income / Bonds",           pct:5,    val:"~$6M",     note:"AllianceBernstein bond funds"},
+  {color:"#a855f7",ticker:"FUNDS",     name:"AllianceBernstein / Managed Funds",     pct:4,    val:"~$4M",     note:"Disclosed in annual financial reports"},
+  {color:"#f43f5e",ticker:"CRM",       name:"Salesforce Inc. (Call Options)",        pct:3,    val:"~$3M",     note:"Feb 2026 call option purchase"},
+  {color:"#fbbf24",ticker:"TSLA",      name:"Tesla Inc. (Put / Sold)",               pct:2,    val:"~$2M",     note:"Sep 2025 put sale · bearish position"},
+  {color:"#d1d5db",ticker:"OTHER",     name:"Other Tech / Miscellaneous",            pct:3,    val:"~$3M",     note:"Smaller undisclosed positions"},
 ];
 
 const PELOSI_TRADES=[
@@ -767,7 +799,6 @@ function renderTrump(){
       <td style="font-size:11px;color:var(--color-text-muted)">${t.note}</td>
     </tr>`).join('');
 
-  // Holdings panel
   document.getElementById('holdingsPanel').innerHTML=TRUMP_HOLDINGS.map(h=>`
     <div class="holding-row">
       <div class="holding-color" style="background:${h.color}"></div>
@@ -785,7 +816,6 @@ function renderTrump(){
       </div>
     </div>`).join('');
 
-  // Pie chart — fully named breakdown
   if(charts.tp)charts.tp.destroy();
   charts.tp=new Chart(document.getElementById('trumpPieChart'),{
     type:'doughnut',
@@ -804,12 +834,7 @@ function renderTrump(){
       plugins:{
         legend:{
           position:'right',
-          labels:{
-            color:'#8892a4',
-            font:{size:10},
-            boxWidth:10,
-            padding:6,
-          }
+          labels:{color:'#8892a4',font:{size:10},boxWidth:10,padding:6}
         },
         tooltip:{callbacks:{
           label:c=>{
@@ -825,6 +850,57 @@ function renderTrump(){
 
 // ── PELOSI ──
 function renderPelosi(){
+  // Holdings panel
+  document.getElementById('pelosiHoldingsPanel').innerHTML=PELOSI_HOLDINGS.map(h=>`
+    <div class="holding-row">
+      <div class="holding-color" style="background:${h.color}"></div>
+      <div class="holding-ticker">${h.ticker}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;color:var(--color-text-muted);margin-bottom:3px;">${h.name}</div>
+        <div class="pct-bar-wrap">
+          <div class="pct-bar" style="background:${h.color};width:${Math.max(h.pct*2,4)}px;opacity:0.7;"></div>
+          <span style="font-size:10px;color:var(--color-text-faint)">${h.note}</span>
+        </div>
+      </div>
+      <div style="text-align:right;margin-left:8px;">
+        <div class="holding-pct" style="color:${h.color}">${h.pct}%</div>
+        <div class="holding-val">${h.val}</div>
+      </div>
+    </div>`).join('');
+
+  // Doughnut pie chart
+  if(charts.pp)charts.pp.destroy();
+  charts.pp=new Chart(document.getElementById('pelosiPieChart'),{
+    type:'doughnut',
+    data:{
+      labels:PELOSI_HOLDINGS.map(h=>`${h.ticker} (${h.pct}%)`),
+      datasets:[{
+        data:PELOSI_HOLDINGS.map(h=>h.pct),
+        backgroundColor:PELOSI_HOLDINGS.map(h=>h.color+'cc'),
+        borderColor:PELOSI_HOLDINGS.map(h=>h.color),
+        borderWidth:1.5,
+        hoverOffset:10
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{
+          position:'right',
+          labels:{color:'#8892a4',font:{size:10},boxWidth:10,padding:6}
+        },
+        tooltip:{callbacks:{
+          label:c=>{
+            const h=PELOSI_HOLDINGS[c.dataIndex];
+            return [` ${h.ticker}: ${h.pct}% of portfolio`,` Est. ${h.val}`,` ${h.note}`];
+          }
+        }}
+      },
+      cutout:'48%'
+    }
+  });
+
+  // Trades table
   document.getElementById('pelosiTradesBody').innerHTML=PELOSI_TRADES.map(t=>`
     <tr>
       <td class="td-ticker">${t.ticker}</td><td style="font-size:12px">${t.company}</td>
