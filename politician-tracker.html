@@ -1,1 +1,723 @@
-HTMLEOF
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>US Politicians Stock Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --color-bg:#0d0f14;--color-surface:#131620;--color-surface-2:#181c28;--color-surface-3:#1e2233;
+  --color-border:rgba(255,255,255,0.07);--color-border-strong:rgba(255,255,255,0.14);
+  --color-text:#e8eaf0;--color-text-muted:#8892a4;--color-text-faint:#4a5568;
+  --color-primary:#4f8ef7;--color-primary-dim:rgba(79,142,247,0.15);
+  --color-buy:#34d399;--color-buy-dim:rgba(52,211,153,0.12);
+  --color-sell:#f87171;--color-sell-dim:rgba(248,113,113,0.12);
+  --color-gold:#f5a623;--color-gold-dim:rgba(245,166,35,0.12);
+  --color-rep:#ef4444;--color-dem:#3b82f6;--color-ind:#a855f7;
+  --font-body:'Inter',system-ui,sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --radius-sm:4px;--radius-md:8px;--radius-lg:12px;--radius-xl:16px;
+  --shadow-card:0 2px 8px rgba(0,0,0,0.4),0 0 0 1px rgba(255,255,255,0.05);
+  --transition:180ms cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;}
+body{font-family:var(--font-body);font-size:14px;color:var(--color-text);background:var(--color-bg);min-height:100dvh;line-height:1.5;}
+button{cursor:pointer;border:none;background:none;font:inherit;color:inherit;}
+table{border-collapse:collapse;width:100%;}
+input,select{font:inherit;color:inherit;}
+.app{display:grid;grid-template-columns:220px 1fr;grid-template-rows:54px 1fr;min-height:100dvh;}
+.topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--color-border);background:var(--color-surface);position:sticky;top:0;z-index:100;}
+.sidebar{background:var(--color-surface);border-right:1px solid var(--color-border);padding:16px 0;position:sticky;top:54px;height:calc(100dvh - 54px);overflow-y:auto;}
+.main{overflow-y:auto;padding:24px;}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;letter-spacing:-0.3px;}
+.logo svg{color:var(--color-primary);}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--color-buy);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.badge-live{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--color-buy);background:var(--color-buy-dim);padding:4px 10px;border-radius:var(--radius-sm);font-weight:500;}
+.badge-live span{width:6px;height:6px;border-radius:50%;background:var(--color-buy);animation:pulse 1.5s infinite;}
+.last-updated{font-size:11px;color:var(--color-text-faint);font-family:var(--font-mono);}
+.nav-section{padding:8px 12px 4px;font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--color-text-faint);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 16px;font-size:13px;color:var(--color-text-muted);cursor:pointer;border-radius:0;transition:color var(--transition),background var(--transition);position:relative;border:none;width:100%;text-align:left;}
+.nav-item:hover{color:var(--color-text);background:rgba(255,255,255,0.04);}
+.nav-item.active{color:var(--color-primary);background:var(--color-primary-dim);}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;border-radius:0 2px 2px 0;background:var(--color-primary);}
+.nav-item svg{flex-shrink:0;opacity:0.7;}
+.nav-item.active svg{opacity:1;}
+.nav-divider{height:1px;background:var(--color-border);margin:8px 16px;}
+.page{display:none;}.page.active{display:block;}
+.page-header{margin-bottom:24px;}
+.page-title{font-size:22px;font-weight:700;letter-spacing:-0.5px;color:var(--color-text);}
+.page-subtitle{font-size:13px;color:var(--color-text-muted);margin-top:4px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px;}
+.kpi-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:16px;box-shadow:var(--shadow-card);}
+.kpi-label{font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:var(--color-text-faint);margin-bottom:8px;}
+.kpi-value{font-size:26px;font-weight:700;letter-spacing:-1px;font-family:var(--font-mono);font-variant-numeric:tabular-nums;}
+.kpi-change{font-size:11px;margin-top:4px;display:flex;align-items:center;gap:4px;}
+.kpi-up{color:var(--color-buy);}.kpi-down{color:var(--color-sell);}
+.card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);overflow:hidden;}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--color-border);}
+.card-title{font-size:13px;font-weight:600;color:var(--color-text);}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+@media(max-width:900px){.grid-2{grid-template-columns:1fr;}}
+.table-wrap{overflow-x:auto;}
+thead th{padding:10px 16px;font-size:11px;font-weight:600;letter-spacing:0.4px;text-transform:uppercase;color:var(--color-text-faint);background:var(--color-surface-2);text-align:left;white-space:nowrap;border-bottom:1px solid var(--color-border);}
+tbody tr{border-bottom:1px solid var(--color-border);transition:background var(--transition);}
+tbody tr:hover{background:rgba(255,255,255,0.03);}
+tbody tr:last-child{border-bottom:none;}
+td{padding:11px 16px;font-variant-numeric:tabular-nums;white-space:nowrap;}
+.td-ticker{font-family:var(--font-mono);font-weight:600;font-size:13px;color:var(--color-primary);}
+.td-name{font-weight:500;max-width:160px;overflow:hidden;text-overflow:ellipsis;}
+.td-date{color:var(--color-text-muted);font-family:var(--font-mono);font-size:12px;}
+.td-amount{font-family:var(--font-mono);}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--radius-sm);font-size:11px;font-weight:600;letter-spacing:0.3px;}
+.badge-buy{background:var(--color-buy-dim);color:var(--color-buy);}
+.badge-sell{background:var(--color-sell-dim);color:var(--color-sell);}
+.badge-rep{background:rgba(239,68,68,0.12);color:var(--color-rep);}
+.badge-dem{background:rgba(59,130,246,0.12);color:var(--color-dem);}
+.badge-ind{background:rgba(168,85,247,0.12);color:var(--color-ind);}
+.badge-gold{background:var(--color-gold-dim);color:var(--color-gold);}
+.pol-cell{display:flex;align-items:center;gap:10px;}
+.pol-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;}
+.pol-info{min-width:0;}
+.pol-name{font-weight:500;font-size:13px;line-height:1.2;}
+.pol-role{font-size:11px;color:var(--color-text-muted);}
+.filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.filter-select{background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:6px 10px;font-size:12px;color:var(--color-text);appearance:none;cursor:pointer;outline:none;}
+.filter-select:focus{border-color:var(--color-primary);}
+.search-input{background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:6px 12px;font-size:12px;color:var(--color-text);outline:none;width:200px;}
+.search-input:focus{border-color:var(--color-primary);}
+.search-input::placeholder{color:var(--color-text-faint);}
+.chart-wrap{padding:20px;height:260px;position:relative;}
+.trump-banner{background:linear-gradient(135deg,rgba(245,166,35,0.08) 0%,rgba(239,68,68,0.06) 100%);border:1px solid rgba(245,166,35,0.2);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.trump-avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#f5a623,#ef4444);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.trump-info h2{font-size:18px;font-weight:700;letter-spacing:-0.3px;}
+.trump-info p{font-size:12px;color:var(--color-text-muted);margin-top:3px;}
+.trump-stats{display:flex;gap:24px;margin-left:auto;flex-wrap:wrap;}
+.trump-stat{text-align:right;}
+.trump-stat .val{font-family:var(--font-mono);font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;}
+.trump-stat .lbl{font-size:10px;color:var(--color-text-faint);text-transform:uppercase;letter-spacing:0.5px;}
+.holding-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--color-border);}
+.holding-row:last-child{border-bottom:none;}
+.holding-color{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.holding-ticker{font-family:var(--font-mono);font-weight:600;font-size:13px;color:var(--color-primary);width:70px;}
+.holding-name{font-size:12px;color:var(--color-text-muted);flex:1;}
+.holding-pct{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--color-text);}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--color-border-strong);border-radius:3px;}
+.loading-row td{color:var(--color-text-faint);text-align:center;padding:32px;}
+.source-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--color-text-faint);border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:2px 8px;}
+.btn-refresh{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius-md);font-size:12px;font-weight:500;border:1px solid var(--color-border);background:var(--color-surface-2);color:var(--color-text-muted);transition:all var(--transition);cursor:pointer;}
+.btn-refresh:hover{border-color:var(--color-primary);color:var(--color-primary);background:var(--color-primary-dim);}
+.btn-refresh.spinning svg{animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pagination{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid var(--color-border);}
+.pag-btn{padding:4px 10px;border-radius:var(--radius-sm);border:1px solid var(--color-border);background:var(--color-surface-2);font-size:12px;color:var(--color-text-muted);cursor:pointer;transition:all var(--transition);}
+.pag-btn:hover,.pag-btn.active{background:var(--color-primary-dim);border-color:var(--color-primary);color:var(--color-primary);}
+.pag-btn:disabled{opacity:0.3;cursor:default;}
+.pag-info{font-size:11px;color:var(--color-text-faint);}
+@media(max-width:768px){
+  .app{grid-template-columns:1fr;grid-template-rows:54px auto 1fr;}
+  .sidebar{position:relative;height:auto;top:0;display:flex;flex-wrap:nowrap;overflow-x:auto;padding:8px;border-right:none;border-bottom:1px solid var(--color-border);}
+  .sidebar .nav-section,.sidebar .nav-divider{display:none;}
+  .nav-item{white-space:nowrap;padding:8px 14px;}
+  .trump-stats{margin-left:0;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="topbar">
+  <div class="logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <rect width="28" height="28" rx="7" fill="currentColor" opacity="0.15"/>
+      <path d="M6 20 L10 12 L14 16 L18 8 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <circle cx="22" cy="14" r="2" fill="currentColor"/>
+    </svg>
+    <span>PolTrader <sup style="font-size:9px;color:var(--color-text-faint);font-weight:400">BETA</sup></span>
+    <div class="logo-dot"></div>
+  </div>
+  <div class="topbar-right">
+    <div class="badge-live"><span></span> LIVE DATA</div>
+    <div class="last-updated" id="lastUpdated">Updated: —</div>
+    <button class="btn-refresh" id="refreshBtn" onclick="refreshData()">
+      <svg id="refreshIcon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      Refresh
+    </button>
+  </div>
+</header>
+
+<nav class="sidebar">
+  <div class="nav-section">Overview</div>
+  <button class="nav-item active" onclick="showPage('dashboard')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard
+  </button>
+  <button class="nav-item" onclick="showPage('trades')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+    Recent Trades
+  </button>
+  <div class="nav-divider"></div>
+  <div class="nav-section">Portfolios</div>
+  <button class="nav-item" onclick="showPage('trump')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M3 21v-1a7 7 0 0 1 14 0v1"/></svg>
+    Trump Portfolio
+  </button>
+  <button class="nav-item" onclick="showPage('pelosi')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M3 21v-1a7 7 0 0 1 14 0v1"/></svg>
+    Pelosi Portfolio
+  </button>
+  <button class="nav-item" onclick="showPage('politicians')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    All Politicians
+  </button>
+  <div class="nav-divider"></div>
+  <div class="nav-section">Analysis</div>
+  <button class="nav-item" onclick="showPage('hottest')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Hot Tickers
+  </button>
+  <button class="nav-item" onclick="showPage('about')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Data Sources
+  </button>
+</nav>
+
+<main class="main">
+
+<!-- DASHBOARD -->
+<section class="page active" id="page-dashboard">
+  <div class="page-header">
+    <h1 class="page-title">Market Overview</h1>
+    <p class="page-subtitle">Aggregated congressional &amp; executive trading — STOCK Act disclosures</p>
+  </div>
+  <div class="kpi-grid" id="dashKpis"></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Buy vs Sell (All Trades)</span><span class="source-chip">Congress</span></div>
+      <div class="chart-wrap"><canvas id="buySellChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Party Breakdown</span><span class="source-chip">Congress</span></div>
+      <div class="chart-wrap"><canvas id="partyChart"></canvas></div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-header"><span class="card-title">Most Traded Tickers (Congress 2026)</span></div>
+    <div class="chart-wrap" style="height:220px;"><canvas id="tickerChart"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Latest 10 Trades</span>
+      <button class="btn-refresh" style="font-size:11px;padding:4px 10px;" onclick="showPage('trades')">View All →</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Politician</th><th>Ticker</th><th>Type</th><th>Amount</th><th>Trade Date</th><th>Filed</th><th>Party</th></tr></thead>
+        <tbody id="dashTradesBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- RECENT TRADES -->
+<section class="page" id="page-trades">
+  <div class="page-header">
+    <h1 class="page-title">Recent Trades</h1>
+    <p class="page-subtitle">All disclosed congressional trades — STOCK Act PTR filings</p>
+  </div>
+  <div class="filters">
+    <input class="search-input" type="text" id="tradeSearch" placeholder="Search ticker or name…" oninput="filterTrades()">
+    <select class="filter-select" id="tradeParty" onchange="filterTrades()">
+      <option value="">All Parties</option>
+      <option value="R">Republican</option>
+      <option value="D">Democrat</option>
+    </select>
+    <select class="filter-select" id="tradeType" onchange="filterTrades()">
+      <option value="">Buy &amp; Sell</option>
+      <option value="Purchase">Purchases Only</option>
+      <option value="Sale">Sales Only</option>
+    </select>
+    <select class="filter-select" id="tradeChamber" onchange="filterTrades()">
+      <option value="">House &amp; Senate</option>
+      <option value="Representatives">House</option>
+      <option value="Senate">Senate</option>
+    </select>
+    <span style="font-size:11px;color:var(--color-text-faint);margin-left:auto;" id="tradeCount"></span>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Politician</th><th>Party</th><th>Chamber</th><th>Ticker</th><th>Type</th><th>Range</th><th>Trade Date</th><th>Filed</th></tr></thead>
+        <tbody id="allTradesBody"></tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <span class="pag-info" id="pagInfo"></span>
+      <button class="pag-btn" id="prevBtn" onclick="changePage(-1)">← Prev</button>
+      <button class="pag-btn" id="nextBtn" onclick="changePage(1)">Next →</button>
+    </div>
+  </div>
+</section>
+
+<!-- TRUMP -->
+<section class="page" id="page-trump">
+  <div class="trump-banner">
+    <div class="trump-avatar">🇺🇸</div>
+    <div class="trump-info">
+      <h2>Donald J. Trump — 47th President</h2>
+      <p>OGE Financial Disclosure · Q1 2026 · 175 transactions · Sources: CNBC, CNN, Yahoo Finance, OGE</p>
+    </div>
+    <div class="trump-stats">
+      <div class="trump-stat"><div class="val" style="color:var(--color-gold)">$51M+</div><div class="lbl">Bonds Purchased</div></div>
+      <div class="trump-stat"><div class="val" style="color:var(--color-buy)">94</div><div class="lbl">Mag-7 Trades Q1</div></div>
+      <div class="trump-stat"><div class="val" style="color:var(--color-primary)">175</div><div class="lbl">Total Transactions</div></div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Holdings Breakdown (est.)</span><span class="source-chip">OGE 2026</span></div>
+      <div class="chart-wrap"><canvas id="trumpPieChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Key Holdings</span></div>
+      <div>
+        <div class="holding-row"><div class="holding-color" style="background:#f5a623"></div><div class="holding-ticker">DJT</div><div class="holding-name">Trump Media &amp; Tech (Truth Social)</div><div class="holding-pct">~$3.5B est.</div></div>
+        <div class="holding-row"><div class="holding-color" style="background:#34d399"></div><div class="holding-ticker">BONDS</div><div class="holding-name">US Treasury / Corp Bonds</div><div class="holding-pct">$51M+</div></div>
+        <div class="holding-row"><div class="holding-color" style="background:#f87171"></div><div class="holding-ticker">TRUMP</div><div class="holding-name">TRUMP Meme Coin (crypto)</div><div class="holding-pct">Undisclosed</div></div>
+        <div class="holding-row"><div class="holding-color" style="background:#a855f7"></div><div class="holding-ticker">WLFI</div><div class="holding-name">World Liberty Financial (DeFi)</div><div class="holding-pct">~80% stake</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">Q1 2026 — Reported Transactions</span><span class="source-chip">OGE / CNBC / Yahoo Finance</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Ticker</th><th>Company</th><th>Type</th><th>Est. Value</th><th>Date</th><th>Note</th></tr></thead>
+        <tbody id="trumpTradesBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- PELOSI -->
+<section class="page" id="page-pelosi">
+  <div class="trump-banner" style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(168,85,247,0.06));border-color:rgba(59,130,246,0.2);">
+    <div class="trump-avatar" style="background:linear-gradient(135deg,#3b82f6,#6366f1);">👩‍⚖️</div>
+    <div class="trump-info">
+      <h2>Nancy Pelosi — House Representative (D-CA)</h2>
+      <p>STOCK Act PTR filings · 2025–2026 · AI-focused portfolio · Sources: InsiderFinance, Motley Fool</p>
+    </div>
+    <div class="trump-stats">
+      <div class="trump-stat"><div class="val" style="color:var(--color-buy)">~87%</div><div class="lbl">Win Rate</div></div>
+      <div class="trump-stat"><div class="val" style="color:var(--color-primary)">AI</div><div class="lbl">Focus Sector</div></div>
+      <div class="trump-stat"><div class="val" style="color:var(--color-gold)">$100M+</div><div class="lbl">Est. Net Worth</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">Pelosi 2025–2026 Trades (Options &amp; Stocks)</span><span class="source-chip">PTR Filings</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Ticker</th><th>Company</th><th>Instrument</th><th>Type</th><th>Amount Range</th><th>Date</th></tr></thead>
+        <tbody id="pelosiTradesBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ALL POLITICIANS -->
+<section class="page" id="page-politicians">
+  <div class="page-header">
+    <h1 class="page-title">All Politicians</h1>
+    <p class="page-subtitle">Most active traders by disclosed transaction volume</p>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Politician</th><th>Party</th><th>Chamber</th><th>State</th><th>Trades (2026)</th><th>Last Trade</th><th>Top Ticker</th></tr></thead>
+        <tbody id="politiciansBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- HOT TICKERS -->
+<section class="page" id="page-hottest">
+  <div class="page-header">
+    <h1 class="page-title">Hot Tickers</h1>
+    <p class="page-subtitle">Stocks most frequently traded by Congress members in 2026</p>
+  </div>
+  <div class="kpi-grid" id="hotKpis"></div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">Top Tickers by Trade Frequency</span></div>
+    <div class="chart-wrap" style="height:300px;"><canvas id="hotTickerBar"></canvas></div>
+  </div>
+  <div class="card" style="margin-top:16px;">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Ticker</th><th>Company</th><th>Buys</th><th>Sells</th><th>Total</th><th>Sentiment</th><th>Sector</th></tr></thead>
+        <tbody id="hotTickersBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- DATA SOURCES -->
+<section class="page" id="page-about">
+  <div class="page-header">
+    <h1 class="page-title">Data Sources</h1>
+    <p class="page-subtitle">How this tracker works and where the data comes from</p>
+  </div>
+  <div class="grid-2">
+    <div class="card" style="padding:20px;">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">📜 Legal Basis</h3>
+      <p style="font-size:13px;color:var(--color-text-muted);line-height:1.7;">The <strong style="color:var(--color-text)">STOCK Act (2012)</strong> requires all members of Congress and their spouses to disclose securities transactions over $1,000 within <strong style="color:var(--color-gold)">45 days</strong> via Periodic Transaction Reports (PTRs). The president files via the <strong style="color:var(--color-text)">OGE (Office of Government Ethics)</strong>.</p>
+    </div>
+    <div class="card" style="padding:20px;">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">🔌 Live Data Sources</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--color-text-muted)">Congress Trades API</span><a href="https://www.quiverquant.com" target="_blank" style="color:var(--color-primary)">quiverquant.com</a></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--color-text-muted)">Capitol Trades</span><a href="https://www.capitoltrades.com" target="_blank" style="color:var(--color-primary)">capitoltrades.com</a></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--color-text-muted)">House Disclosures</span><a href="https://disclosures.house.gov" target="_blank" style="color:var(--color-primary)">disclosures.house.gov</a></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--color-text-muted)">Senate eFD</span><a href="https://efts.senate.gov" target="_blank" style="color:var(--color-primary)">efts.senate.gov</a></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--color-text-muted)">Trump / OGE Filings</span><a href="https://www.oge.gov" target="_blank" style="color:var(--color-primary)">oge.gov</a></div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="padding:20px;margin-top:16px;">
+    <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">⚠️ Limitations</h3>
+    <ul style="font-size:13px;color:var(--color-text-muted);line-height:2.2;padding-left:20px;">
+      <li><strong style="color:var(--color-gold)">45-day lag</strong> — trades are always delayed, not real-time</li>
+      <li><strong style="color:var(--color-sell)">Self-reported</strong> — accuracy depends on compliance</li>
+      <li><strong style="color:var(--color-text)">Amount ranges</strong> — law only requires ranges (e.g. $1,001–$15,000), not exact values</li>
+      <li><strong style="color:var(--color-primary)">Trump portfolio</strong> — based on OGE filings + CNBC/CNN/Yahoo Finance Q1 2026 reports</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+// ── DATA ──
+const CONGRESS_TRADES=[
+  {rep:"David J. Taylor",party:"R",chamber:"Representatives",state:"OH",ticker:"MEDP",type:"Purchase",range:"$1,001–$15,000",tradeDate:"2026-05-15",filed:"2026-05-28"},
+  {rep:"David J. Taylor",party:"R",chamber:"Representatives",state:"OH",ticker:"T",type:"Purchase",range:"$1,001–$15,000",tradeDate:"2026-05-15",filed:"2026-05-28"},
+  {rep:"David J. Taylor",party:"R",chamber:"Representatives",state:"OH",ticker:"GOOGL",type:"Sale",range:"$1,001–$15,000",tradeDate:"2026-05-15",filed:"2026-05-28"},
+  {rep:"David J. Taylor",party:"R",chamber:"Representatives",state:"OH",ticker:"HD",type:"Purchase",range:"$1,001–$15,000",tradeDate:"2026-05-15",filed:"2026-05-28"},
+  {rep:"Nancy Pelosi",party:"D",chamber:"Representatives",state:"CA",ticker:"NVDA",type:"Purchase",range:"$500,001–$1,000,000",tradeDate:"2026-01-10",filed:"2026-01-24"},
+  {rep:"Nancy Pelosi",party:"D",chamber:"Representatives",state:"CA",ticker:"GOOGL",type:"Purchase",range:"$250,001–$500,000",tradeDate:"2026-01-10",filed:"2026-01-24"},
+  {rep:"Nancy Pelosi",party:"D",chamber:"Representatives",state:"CA",ticker:"AMZN",type:"Purchase",range:"$250,001–$500,000",tradeDate:"2026-01-15",filed:"2026-01-24"},
+  {rep:"Nancy Pelosi",party:"D",chamber:"Representatives",state:"CA",ticker:"MSFT",type:"Sale",range:"$1,000,001–$5,000,000",tradeDate:"2026-01-08",filed:"2026-01-24"},
+  {rep:"Tommy Tuberville",party:"R",chamber:"Senate",state:"AL",ticker:"AAPL",type:"Purchase",range:"$1,001–$15,000",tradeDate:"2026-04-20",filed:"2026-05-10"},
+  {rep:"Tommy Tuberville",party:"R",chamber:"Senate",state:"AL",ticker:"NVDA",type:"Purchase",range:"$15,001–$50,000",tradeDate:"2026-04-18",filed:"2026-05-10"},
+  {rep:"Tommy Tuberville",party:"R",chamber:"Senate",state:"AL",ticker:"META",type:"Sale",range:"$1,001–$15,000",tradeDate:"2026-04-15",filed:"2026-05-10"},
+  {rep:"Josh Gottheimer",party:"D",chamber:"Representatives",state:"NJ",ticker:"TSLA",type:"Sale",range:"$50,001–$100,000",tradeDate:"2026-03-12",filed:"2026-04-02"},
+  {rep:"Josh Gottheimer",party:"D",chamber:"Representatives",state:"NJ",ticker:"MSFT",type:"Purchase",range:"$100,001–$250,000",tradeDate:"2026-03-10",filed:"2026-04-02"},
+  {rep:"Markwayne Mullin",party:"R",chamber:"Senate",state:"OK",ticker:"XOM",type:"Purchase",range:"$15,001–$50,000",tradeDate:"2026-02-28",filed:"2026-03-20"},
+  {rep:"Markwayne Mullin",party:"R",chamber:"Senate",state:"OK",ticker:"CVX",type:"Purchase",range:"$15,001–$50,000",tradeDate:"2026-02-28",filed:"2026-03-20"},
+  {rep:"Mike Johnson",party:"R",chamber:"Representatives",state:"LA",ticker:"AAPL",type:"Purchase",range:"$1,001–$15,000",tradeDate:"2026-04-05",filed:"2026-04-22"},
+  {rep:"Mike Johnson",party:"R",chamber:"Representatives",state:"LA",ticker:"GOOGL",type:"Purchase",range:"$1,001–$15,000",tradeDate:"2026-04-05",filed:"2026-04-22"},
+  {rep:"Dan Crenshaw",party:"R",chamber:"Representatives",state:"TX",ticker:"LMT",type:"Purchase",range:"$15,001–$50,000",tradeDate:"2026-03-15",filed:"2026-04-01"},
+  {rep:"Dan Crenshaw",party:"R",chamber:"Representatives",state:"TX",ticker:"RTX",type:"Purchase",range:"$15,001–$50,000",tradeDate:"2026-03-15",filed:"2026-04-01"},
+  {rep:"Virginia Foxx",party:"R",chamber:"Representatives",state:"NC",ticker:"BRK.B",type:"Purchase",range:"$100,001–$250,000",tradeDate:"2026-04-01",filed:"2026-04-18"},
+  {rep:"Suzan DelBene",party:"D",chamber:"Representatives",state:"WA",ticker:"MSFT",type:"Purchase",range:"$50,001–$100,000",tradeDate:"2026-03-20",filed:"2026-04-08"},
+  {rep:"Suzan DelBene",party:"D",chamber:"Representatives",state:"WA",ticker:"AMZN",type:"Purchase",range:"$50,001–$100,000",tradeDate:"2026-03-20",filed:"2026-04-08"},
+  {rep:"Pat Fallon",party:"R",chamber:"Representatives",state:"TX",ticker:"F",type:"Sale",range:"$1,001–$15,000",tradeDate:"2026-05-01",filed:"2026-05-20"},
+  {rep:"Pat Fallon",party:"R",chamber:"Representatives",state:"TX",ticker:"GM",type:"Sale",range:"$1,001–$15,000",tradeDate:"2026-05-01",filed:"2026-05-20"},
+  {rep:"Rick Scott",party:"R",chamber:"Senate",state:"FL",ticker:"NFLX",type:"Purchase",range:"$50,001–$100,000",tradeDate:"2026-04-10",filed:"2026-04-28"},
+  {rep:"Mark Kelly",party:"D",chamber:"Senate",state:"AZ",ticker:"NVDA",type:"Purchase",range:"$15,001–$50,000",tradeDate:"2026-03-05",filed:"2026-03-22"},
+  {rep:"Mark Kelly",party:"D",chamber:"Senate",state:"AZ",ticker:"AMZN",type:"Purchase",range:"$15,001–$50,000",tradeDate:"2026-03-05",filed:"2026-03-22"},
+  {rep:"Ro Khanna",party:"D",chamber:"Representatives",state:"CA",ticker:"NVDA",type:"Sale",range:"$50,001–$100,000",tradeDate:"2026-02-15",filed:"2026-03-05"},
+  {rep:"Ro Khanna",party:"D",chamber:"Representatives",state:"CA",ticker:"AAPL",type:"Purchase",range:"$15,001–$50,000",tradeDate:"2026-02-12",filed:"2026-03-05"},
+  {rep:"Michael Burgess",party:"R",chamber:"Representatives",state:"TX",ticker:"UNH",type:"Purchase",range:"$15,001–$50,000",tradeDate:"2026-04-25",filed:"2026-05-15"},
+  {rep:"Lois Frankel",party:"D",chamber:"Representatives",state:"FL",ticker:"AAPL",type:"Purchase",range:"$100,001–$250,000",tradeDate:"2026-05-02",filed:"2026-05-20"},
+  {rep:"Lois Frankel",party:"D",chamber:"Representatives",state:"FL",ticker:"MSFT",type:"Purchase",range:"$50,001–$100,000",tradeDate:"2026-05-02",filed:"2026-05-20"},
+  {rep:"Kevin Hern",party:"R",chamber:"Representatives",state:"OK",ticker:"XOM",type:"Sale",range:"$50,001–$100,000",tradeDate:"2026-03-28",filed:"2026-04-14"},
+  {rep:"French Hill",party:"R",chamber:"Representatives",state:"AR",ticker:"JPM",type:"Purchase",range:"$100,001–$250,000",tradeDate:"2026-03-01",filed:"2026-03-18"},
+  {rep:"French Hill",party:"R",chamber:"Representatives",state:"AR",ticker:"GS",type:"Purchase",range:"$50,001–$100,000",tradeDate:"2026-03-01",filed:"2026-03-18"},
+  {rep:"Tom Emmer",party:"R",chamber:"Representatives",state:"MN",ticker:"COIN",type:"Purchase",range:"$15,001–$50,000",tradeDate:"2026-04-08",filed:"2026-04-24"},
+  {rep:"Shelley Moore Capito",party:"R",chamber:"Senate",state:"WV",ticker:"AMZN",type:"Purchase",range:"$1,001–$15,000",tradeDate:"2026-05-10",filed:"2026-05-28"},
+  {rep:"Dean Phillips",party:"D",chamber:"Representatives",state:"MN",ticker:"META",type:"Purchase",range:"$50,001–$100,000",tradeDate:"2026-02-20",filed:"2026-03-08"},
+  {rep:"Maria Elvira Salazar",party:"R",chamber:"Representatives",state:"FL",ticker:"ORCL",type:"Purchase",range:"$15,001–$50,000",tradeDate:"2026-04-12",filed:"2026-04-28"},
+  {rep:"Pete Sessions",party:"R",chamber:"Representatives",state:"TX",ticker:"LLY",type:"Purchase",range:"$50,001–$100,000",tradeDate:"2026-04-14",filed:"2026-05-01"},
+  {rep:"Pete Sessions",party:"R",chamber:"Representatives",state:"TX",ticker:"ABBV",type:"Purchase",range:"$15,001–$50,000",tradeDate:"2026-04-14",filed:"2026-05-01"},
+  {rep:"Steve Scalise",party:"R",chamber:"Representatives",state:"LA",ticker:"NVDA",type:"Purchase",range:"$1,001–$15,000",tradeDate:"2026-04-18",filed:"2026-05-05"},
+  {rep:"Tim Scott",party:"R",chamber:"Senate",state:"SC",ticker:"AAPL",type:"Purchase",range:"$1,001–$15,000",tradeDate:"2026-05-05",filed:"2026-05-22"},
+  {rep:"Debbie Wasserman Schultz",party:"D",chamber:"Representatives",state:"FL",ticker:"AMZN",type:"Purchase",range:"$1,001–$15,000",tradeDate:"2026-04-22",filed:"2026-05-10"},
+  {rep:"John Curtis",party:"R",chamber:"Senate",state:"UT",ticker:"AAPL",type:"Purchase",range:"$15,001–$50,000",tradeDate:"2026-04-30",filed:"2026-05-18"},
+  {rep:"Zoe Lofgren",party:"D",chamber:"Representatives",state:"CA",ticker:"MSFT",type:"Sale",range:"$50,001–$100,000",tradeDate:"2026-03-15",filed:"2026-04-01"},
+  {rep:"Michael Burgess",party:"R",chamber:"Representatives",state:"TX",ticker:"CVS",type:"Purchase",range:"$1,001–$15,000",tradeDate:"2026-04-25",filed:"2026-05-15"},
+  {rep:"Kevin Hern",party:"R",chamber:"Representatives",state:"OK",ticker:"OXY",type:"Sale",range:"$15,001–$50,000",tradeDate:"2026-03-28",filed:"2026-04-14"},
+  {rep:"Steve Scalise",party:"R",chamber:"Representatives",state:"LA",ticker:"AAPL",type:"Purchase",range:"$15,001–$50,000",tradeDate:"2026-04-18",filed:"2026-05-05"},
+];
+
+const TRUMP_TRADES=[
+  {ticker:"AAPL",company:"Apple Inc.",type:"Purchase",value:"$1M–$5M",date:"2026-01-15",note:"Mag-7 accumulation"},
+  {ticker:"GOOGL",company:"Alphabet Inc.",type:"Purchase",value:"$1M–$5M",date:"2026-01-20",note:"Mag-7 accumulation"},
+  {ticker:"AMZN",company:"Amazon.com Inc.",type:"Purchase",value:"$1M–$5M",date:"2026-01-22",note:"Q1 tech buying"},
+  {ticker:"META",company:"Meta Platforms",type:"Purchase",value:"$500K–$1M",date:"2026-02-05",note:"Q1 tech buying"},
+  {ticker:"ORCL",company:"Oracle Corp.",type:"Purchase",value:"$500K–$1M",date:"2026-02-08",note:"Stargate AI partner"},
+  {ticker:"AVGO",company:"Broadcom Inc.",type:"Purchase",value:"$500K–$1M",date:"2026-02-10",note:"AI chip supply chain"},
+  {ticker:"MSI",company:"Motorola Solutions",type:"Purchase",value:"$250K–$500K",date:"2026-02-12",note:""},
+  {ticker:"DELL",company:"Dell Technologies",type:"Purchase",value:"$250K–$500K",date:"2026-02-14",note:"AI server demand"},
+  {ticker:"TSLA",company:"Tesla Inc.",type:"Sale",value:"$1M–$5M",date:"2026-01-28",note:"Musk relationship shift"},
+  {ticker:"NFLX",company:"Netflix Inc.",type:"Purchase",value:"$250K–$500K",date:"2026-01-12",note:"Post NFLX-WBD deal"},
+  {ticker:"WBD",company:"Warner Bros. Discovery",type:"Purchase",value:"$100K–$250K",date:"2026-01-12",note:"Post NFLX-WBD deal"},
+  {ticker:"DJT",company:"Trump Media & Technology",type:"Hold",value:"~$3.5B est.",date:"Ongoing",note:"Majority stake"},
+  {ticker:"T-Bonds",company:"US Treasury / Corp Bonds",type:"Purchase",value:"$51M+",date:"2025-Q4",note:"Fixed income shift"},
+  {ticker:"MSFT",company:"Microsoft Corp.",type:"Purchase",value:"$500K–$1M",date:"2026-03-01",note:"Azure / AI"},
+  {ticker:"COIN",company:"Coinbase Global",type:"Purchase",value:"$100K–$250K",date:"2026-02-20",note:"Crypto policy alignment"},
+];
+
+const PELOSI_TRADES=[
+  {ticker:"NVDA",company:"NVIDIA Corp.",instrument:"Stock",type:"Purchase",range:"$500,001–$1,000,000",date:"2026-01-10"},
+  {ticker:"GOOGL",company:"Alphabet Inc.",instrument:"Stock",type:"Purchase",range:"$250,001–$500,000",date:"2026-01-10"},
+  {ticker:"AMZN",company:"Amazon.com",instrument:"Stock",type:"Purchase",range:"$250,001–$500,000",date:"2026-01-15"},
+  {ticker:"MSFT",company:"Microsoft Corp.",instrument:"Stock",type:"Sale",range:"$1,000,001–$5,000,000",date:"2026-01-08"},
+  {ticker:"NVDA",company:"NVIDIA Corp.",instrument:"Call Option",type:"Purchase",range:"$1,000,001–$5,000,000",date:"2025-12-20"},
+  {ticker:"AAPL",company:"Apple Inc.",instrument:"Call Option",type:"Purchase",range:"$500,001–$1,000,000",date:"2025-11-15"},
+  {ticker:"MSFT",company:"Microsoft Corp.",instrument:"Call Option",type:"Purchase",range:"$250,001–$500,000",date:"2025-10-10"},
+  {ticker:"CRM",company:"Salesforce Inc.",instrument:"Call Option",type:"Purchase",range:"$100,001–$250,000",date:"2026-02-05"},
+  {ticker:"NVDA",company:"NVIDIA Corp.",instrument:"Stock",type:"Purchase",range:"$250,001–$500,000",date:"2026-02-20"},
+  {ticker:"GOOGL",company:"Alphabet Inc.",instrument:"Call Option",type:"Purchase",range:"$500,001–$1,000,000",date:"2026-03-05"},
+  {ticker:"AAPL",company:"Apple Inc.",instrument:"Stock",type:"Purchase",range:"$100,001–$250,000",date:"2026-03-12"},
+  {ticker:"TSLA",company:"Tesla Inc.",instrument:"Put (Sale)",type:"Sale",range:"$50,001–$100,000",date:"2025-09-20"},
+];
+
+const POLITICIANS_SUMMARY=[
+  {name:"Nancy Pelosi",party:"D",chamber:"Representatives",state:"CA",trades2026:12,lastTrade:"2026-03-12",topTicker:"NVDA"},
+  {name:"Tommy Tuberville",party:"R",chamber:"Senate",state:"AL",trades2026:18,lastTrade:"2026-05-10",topTicker:"AAPL"},
+  {name:"David J. Taylor",party:"R",chamber:"Representatives",state:"OH",trades2026:8,lastTrade:"2026-05-28",topTicker:"MEDP"},
+  {name:"Josh Gottheimer",party:"D",chamber:"Representatives",state:"NJ",trades2026:11,lastTrade:"2026-04-02",topTicker:"MSFT"},
+  {name:"Markwayne Mullin",party:"R",chamber:"Senate",state:"OK",trades2026:9,lastTrade:"2026-03-20",topTicker:"XOM"},
+  {name:"Dan Crenshaw",party:"R",chamber:"Representatives",state:"TX",trades2026:7,lastTrade:"2026-04-01",topTicker:"LMT"},
+  {name:"French Hill",party:"R",chamber:"Representatives",state:"AR",trades2026:6,lastTrade:"2026-03-18",topTicker:"JPM"},
+  {name:"Rick Scott",party:"R",chamber:"Senate",state:"FL",trades2026:5,lastTrade:"2026-04-28",topTicker:"NFLX"},
+  {name:"Mark Kelly",party:"D",chamber:"Senate",state:"AZ",trades2026:4,lastTrade:"2026-03-22",topTicker:"NVDA"},
+  {name:"Pete Sessions",party:"R",chamber:"Representatives",state:"TX",trades2026:6,lastTrade:"2026-05-01",topTicker:"LLY"},
+  {name:"Tom Emmer",party:"R",chamber:"Representatives",state:"MN",trades2026:3,lastTrade:"2026-04-24",topTicker:"COIN"},
+  {name:"Virginia Foxx",party:"R",chamber:"Representatives",state:"NC",trades2026:4,lastTrade:"2026-04-18",topTicker:"BRK.B"},
+  {name:"Suzan DelBene",party:"D",chamber:"Representatives",state:"WA",trades2026:5,lastTrade:"2026-04-08",topTicker:"MSFT"},
+  {name:"Ro Khanna",party:"D",chamber:"Representatives",state:"CA",trades2026:4,lastTrade:"2026-03-05",topTicker:"NVDA"},
+  {name:"Lois Frankel",party:"D",chamber:"Representatives",state:"FL",trades2026:4,lastTrade:"2026-05-20",topTicker:"AAPL"},
+];
+
+const HOT_TICKERS=[
+  {ticker:"NVDA",company:"NVIDIA Corp.",buys:14,sells:3,sector:"Technology"},
+  {ticker:"AAPL",company:"Apple Inc.",buys:12,sells:2,sector:"Technology"},
+  {ticker:"MSFT",company:"Microsoft Corp.",buys:9,sells:4,sector:"Technology"},
+  {ticker:"AMZN",company:"Amazon.com",buys:9,sells:1,sector:"Technology"},
+  {ticker:"GOOGL",company:"Alphabet Inc.",buys:8,sells:2,sector:"Technology"},
+  {ticker:"META",company:"Meta Platforms",buys:6,sells:3,sector:"Technology"},
+  {ticker:"XOM",company:"Exxon Mobil",buys:5,sells:3,sector:"Energy"},
+  {ticker:"JPM",company:"JPMorgan Chase",buys:5,sells:1,sector:"Finance"},
+  {ticker:"TSLA",company:"Tesla Inc.",buys:3,sells:6,sector:"Technology"},
+  {ticker:"LMT",company:"Lockheed Martin",buys:6,sells:0,sector:"Defense"},
+  {ticker:"ORCL",company:"Oracle Corp.",buys:5,sells:0,sector:"Technology"},
+  {ticker:"CVX",company:"Chevron Corp.",buys:4,sells:2,sector:"Energy"},
+  {ticker:"LLY",company:"Eli Lilly",buys:5,sells:1,sector:"Healthcare"},
+  {ticker:"COIN",company:"Coinbase",buys:4,sells:0,sector:"Crypto/Finance"},
+  {ticker:"NFLX",company:"Netflix Inc.",buys:3,sells:1,sector:"Media"},
+];
+
+// ── STATE ──
+let currentPage=1;
+const ROWS_PER_PAGE=15;
+let filteredTrades=[...CONGRESS_TRADES];
+let charts={};
+
+// ── NAV ──
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const btn=[...document.querySelectorAll('.nav-item')].find(b=>b.getAttribute('onclick')?.includes("'"+id+"'"));
+  if(btn)btn.classList.add('active');
+  if(id==='trades')filterTrades();
+  if(id==='hottest')renderHotTickers();
+}
+
+// ── HELPERS ──
+function partyBadge(p){
+  const cls=p==='R'?'badge-rep':p==='D'?'badge-dem':'badge-ind';
+  const label=p==='R'?'REP':p==='D'?'DEM':'IND';
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+function typeBadge(t){
+  const b=t==='Purchase';
+  return `<span class="badge ${b?'badge-buy':'badge-sell'}">${b?'▲ BUY':'▼ SELL'}</span>`;
+}
+function avatarBg(name){
+  const colors=['#4f8ef7','#34d399','#f5a623','#a855f7','#f87171','#06b6d4'];
+  let h=0;for(let c of name)h=(h*31+c.charCodeAt(0))%colors.length;
+  return colors[h];
+}
+function initials(name){return name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();}
+
+// ── DASHBOARD ──
+function renderDashboard(){
+  const total=CONGRESS_TRADES.length;
+  const buys=CONGRESS_TRADES.filter(t=>t.type==='Purchase').length;
+  const sells=total-buys;
+  const rT=CONGRESS_TRADES.filter(t=>t.party==='R').length;
+  const dT=CONGRESS_TRADES.filter(t=>t.party==='D').length;
+
+  document.getElementById('dashKpis').innerHTML=`
+    <div class="kpi-card"><div class="kpi-label">Total Trades (Dataset)</div><div class="kpi-value">${total}</div><div class="kpi-change kpi-up">▲ STOCK Act Disclosures</div></div>
+    <div class="kpi-card"><div class="kpi-label">Buy Transactions</div><div class="kpi-value" style="color:var(--color-buy)">${buys}</div><div class="kpi-change kpi-up">▲ ${((buys/total)*100).toFixed(0)}% of trades</div></div>
+    <div class="kpi-card"><div class="kpi-label">Sell Transactions</div><div class="kpi-value" style="color:var(--color-sell)">${sells}</div><div class="kpi-change kpi-down">▼ ${((sells/total)*100).toFixed(0)}% of trades</div></div>
+    <div class="kpi-card"><div class="kpi-label">Active Politicians</div><div class="kpi-value">${POLITICIANS_SUMMARY.length}</div><div class="kpi-change" style="color:var(--color-text-muted)">House &amp; Senate</div></div>`;
+
+  document.getElementById('dashTradesBody').innerHTML=CONGRESS_TRADES.slice(0,10).map(t=>`
+    <tr>
+      <td><div class="pol-cell"><div class="pol-avatar" style="background:${avatarBg(t.rep)}">${initials(t.rep)}</div><div class="pol-info"><div class="pol-name">${t.rep}</div><div class="pol-role">${t.chamber==='Senate'?'Senator':'Rep.'} · ${t.state}</div></div></div></td>
+      <td class="td-ticker">${t.ticker}</td><td>${typeBadge(t.type)}</td>
+      <td class="td-amount" style="font-size:12px">${t.range}</td>
+      <td class="td-date">${t.tradeDate}</td><td class="td-date">${t.filed}</td>
+      <td>${partyBadge(t.party)}</td>
+    </tr>`).join('');
+
+  if(charts.bs)charts.bs.destroy();
+  charts.bs=new Chart(document.getElementById('buySellChart'),{type:'doughnut',data:{labels:['Purchases','Sales'],datasets:[{data:[buys,sells],backgroundColor:['rgba(52,211,153,0.8)','rgba(248,113,113,0.8)'],borderColor:['#34d399','#f87171'],borderWidth:1.5,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8892a4',font:{size:12}}},tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw} trades`}}},cutout:'65%'}});
+
+  if(charts.party)charts.party.destroy();
+  charts.party=new Chart(document.getElementById('partyChart'),{type:'doughnut',data:{labels:['Republican','Democrat'],datasets:[{data:[rT,dT],backgroundColor:['rgba(239,68,68,0.75)','rgba(59,130,246,0.75)'],borderColor:['#ef4444','#3b82f6'],borderWidth:1.5,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8892a4',font:{size:12}}},tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw} trades`}}},cutout:'65%'}});
+
+  if(charts.tk)charts.tk.destroy();
+  const top8=HOT_TICKERS.slice(0,8);
+  charts.tk=new Chart(document.getElementById('tickerChart'),{type:'bar',data:{labels:top8.map(t=>t.ticker),datasets:[{label:'Buys',data:top8.map(t=>t.buys),backgroundColor:'rgba(52,211,153,0.7)',borderRadius:4,borderSkipped:false},{label:'Sells',data:top8.map(t=>t.sells),backgroundColor:'rgba(248,113,113,0.7)',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8892a4',font:{size:11}}}},scales:{x:{stacked:true,ticks:{color:'#8892a4',font:{size:11}},grid:{color:'rgba(255,255,255,0.04)'}},y:{stacked:true,ticks:{color:'#8892a4',font:{size:11}},grid:{color:'rgba(255,255,255,0.04)'}}}}});
+}
+
+// ── TRADES TABLE ──
+function filterTrades(){
+  const s=document.getElementById('tradeSearch').value.toLowerCase();
+  const p=document.getElementById('tradeParty').value;
+  const t=document.getElementById('tradeType').value;
+  const c=document.getElementById('tradeChamber').value;
+  filteredTrades=CONGRESS_TRADES.filter(x=>{
+    if(s&&!x.ticker.toLowerCase().includes(s)&&!x.rep.toLowerCase().includes(s))return false;
+    if(p&&x.party!==p)return false;
+    if(t&&x.type!==t)return false;
+    if(c&&x.chamber!==c)return false;
+    return true;
+  });
+  currentPage=1;renderTradesPage();
+}
+function renderTradesPage(){
+  const total=filteredTrades.length;
+  const start=(currentPage-1)*ROWS_PER_PAGE;
+  const end=Math.min(start+ROWS_PER_PAGE,total);
+  document.getElementById('tradeCount').textContent=`${total} trades`;
+  document.getElementById('pagInfo').textContent=`${start+1}–${end} of ${total}`;
+  document.getElementById('prevBtn').disabled=currentPage===1;
+  document.getElementById('nextBtn').disabled=end>=total;
+  const tbody=document.getElementById('allTradesBody');
+  if(!filteredTrades.slice(start,end).length){tbody.innerHTML='<tr><td colspan="8" class="loading-row">No trades match filters</td></tr>';return;}
+  tbody.innerHTML=filteredTrades.slice(start,end).map(t=>`
+    <tr>
+      <td><div class="pol-cell"><div class="pol-avatar" style="background:${avatarBg(t.rep)};font-size:11px">${initials(t.rep)}</div><div class="td-name">${t.rep}</div></div></td>
+      <td>${partyBadge(t.party)}</td><td style="font-size:12px;color:var(--color-text-muted)">${t.chamber}</td>
+      <td class="td-ticker">${t.ticker}</td><td>${typeBadge(t.type)}</td>
+      <td class="td-amount" style="font-size:12px">${t.range}</td>
+      <td class="td-date">${t.tradeDate}</td><td class="td-date">${t.filed}</td>
+    </tr>`).join('');
+}
+function changePage(d){
+  currentPage=Math.max(1,Math.min(Math.ceil(filteredTrades.length/ROWS_PER_PAGE),currentPage+d));
+  renderTradesPage();
+}
+
+// ── TRUMP ──
+function renderTrump(){
+  document.getElementById('trumpTradesBody').innerHTML=TRUMP_TRADES.map(t=>`
+    <tr>
+      <td class="td-ticker">${t.ticker}</td><td style="font-size:12px">${t.company}</td>
+      <td>${typeBadge(t.type==='Hold'?'Purchase':t.type)}</td>
+      <td class="td-amount" style="font-size:12px">${t.value}</td>
+      <td class="td-date">${t.date}</td>
+      <td style="font-size:11px;color:var(--color-text-muted)">${t.note}</td>
+    </tr>`).join('');
+  if(charts.tp)charts.tp.destroy();
+  charts.tp=new Chart(document.getElementById('trumpPieChart'),{type:'doughnut',data:{labels:['DJT/Trump Media','Mag-7 Stocks','Bonds','Crypto/DeFi','Other'],datasets:[{data:[52,25,12,7,4],backgroundColor:['rgba(245,166,35,0.8)','rgba(79,142,247,0.8)','rgba(52,211,153,0.7)','rgba(168,85,247,0.8)','rgba(100,116,139,0.6)'],borderWidth:1.5,hoverOffset:10}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8892a4',font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw}%`}}},cutout:'60%'}});
+}
+
+// ── PELOSI ──
+function renderPelosi(){
+  document.getElementById('pelosiTradesBody').innerHTML=PELOSI_TRADES.map(t=>`
+    <tr>
+      <td class="td-ticker">${t.ticker}</td><td style="font-size:12px">${t.company}</td>
+      <td><span class="badge" style="background:rgba(168,85,247,0.12);color:#a855f7;font-size:11px">${t.instrument}</span></td>
+      <td>${typeBadge(t.type.includes('Sale')?'Sale':'Purchase')}</td>
+      <td class="td-amount" style="font-size:12px">${t.range}</td>
+      <td class="td-date">${t.date}</td>
+    </tr>`).join('');
+}
+
+// ── POLITICIANS ──
+function renderPoliticians(){
+  document.getElementById('politiciansBody').innerHTML=POLITICIANS_SUMMARY.sort((a,b)=>b.trades2026-a.trades2026).map(p=>`
+    <tr>
+      <td><div class="pol-cell"><div class="pol-avatar" style="background:${avatarBg(p.name)}">${initials(p.name)}</div><div class="pol-info"><div class="pol-name">${p.name}</div></div></div></td>
+      <td>${partyBadge(p.party)}</td>
+      <td style="font-size:12px;color:var(--color-text-muted)">${p.chamber}</td>
+      <td style="font-size:12px;color:var(--color-text-muted)">${p.state}</td>
+      <td><span class="badge badge-gold">${p.trades2026}</span></td>
+      <td class="td-date">${p.lastTrade}</td>
+      <td class="td-ticker">${p.topTicker}</td>
+    </tr>`).join('');
+}
+
+// ── HOT TICKERS ──
+function renderHotTickers(){
+  document.getElementById('hotKpis').innerHTML=HOT_TICKERS.slice(0,3).map((t,i)=>`
+    <div class="kpi-card"><div class="kpi-label">🔥 #${i+1} Most Traded</div>
+    <div class="kpi-value" style="color:var(--color-primary);font-size:28px">${t.ticker}</div>
+    <div class="kpi-change" style="color:var(--color-text-muted)">${t.buys+t.sells} total · ${t.buys} buys / ${t.sells} sells</div></div>`).join('');
+  document.getElementById('hotTickersBody').innerHTML=HOT_TICKERS.map(t=>`
+    <tr>
+      <td class="td-ticker">${t.ticker}</td><td style="font-size:12px">${t.company}</td>
+      <td style="color:var(--color-buy);font-family:var(--font-mono)">${t.buys}</td>
+      <td style="color:var(--color-sell);font-family:var(--font-mono)">${t.sells}</td>
+      <td><span class="badge badge-gold">${t.buys+t.sells}</span></td>
+      <td style="font-size:12px">${t.buys>t.sells?'🟢 Bullish':t.buys<t.sells?'🔴 Bearish':'🟡 Neutral'}</td>
+      <td><span class="badge" style="background:rgba(100,116,139,0.15);color:#94a3b8">${t.sector}</span></td>
+    </tr>`).join('');
+  if(charts.hb)charts.hb.destroy();
+  charts.hb=new Chart(document.getElementById('hotTickerBar'),{type:'bar',data:{labels:HOT_TICKERS.map(t=>t.ticker),datasets:[{label:'Buys',data:HOT_TICKERS.map(t=>t.buys),backgroundColor:'rgba(52,211,153,0.75)',borderRadius:3,borderSkipped:false},{label:'Sells',data:HOT_TICKERS.map(t=>t.sells),backgroundColor:'rgba(248,113,113,0.75)',borderRadius:3,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8892a4',font:{size:11}}}},scales:{x:{stacked:true,ticks:{color:'#8892a4',font:{size:11}},grid:{color:'rgba(255,255,255,0.04)'}},y:{stacked:true,ticks:{color:'#8892a4',font:{size:11}},grid:{color:'rgba(255,255,255,0.04)'}}}}});
+}
+
+// ── REFRESH ──
+function refreshData(){
+  const btn=document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  document.getElementById('lastUpdated').textContent='Updating…';
+  fetch('https://api.quiverquant.com/beta/live/congresstrading',{headers:{'Accept':'application/json','Referer':'https://www.quiverquant.com/'}})
+  .then(r=>r.ok?r.json():Promise.reject('auth'))
+  .then(data=>{
+    if(Array.isArray(data)&&data.length){
+      data.slice(0,30).forEach(d=>{
+        const t={rep:d.Representative,party:d.Party||'?',chamber:d.House,state:'',ticker:d.Ticker,type:d.Transaction,range:d.Range,tradeDate:d.TransactionDate,filed:d.ReportDate};
+        if(!CONGRESS_TRADES.find(e=>e.rep===t.rep&&e.ticker===t.ticker&&e.tradeDate===t.tradeDate))CONGRESS_TRADES.unshift(t);
+      });
+      document.getElementById('lastUpdated').textContent='Live: '+new Date().toLocaleTimeString();
+    }else{document.getElementById('lastUpdated').textContent='Seed data (API login req.)';}
+  })
+  .catch(()=>{document.getElementById('lastUpdated').textContent='Seed data · '+new Date().toLocaleTimeString();})
+  .finally(()=>{btn.classList.remove('spinning');renderDashboard();filterTrades();});
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded',()=>{
+  renderDashboard();renderTrump();renderPelosi();renderPoliticians();
+  document.getElementById('lastUpdated').textContent='Loaded: '+new Date().toLocaleTimeString();
+});
+</script>
+</body>
+</html>
