@@ -294,16 +294,16 @@ td{padding:11px 16px;font-variant-numeric:tabular-nums;white-space:nowrap;}
   <div class="grid-2">
     <div class="card">
       <div class="card-header">
-        <span class="card-title">Portfolio Breakdown by Asset Class (% of Est. Net Worth)</span>
-        <span class="source-chip">OGE / Forbes 2026</span>
+        <span class="card-title">Full Portfolio — Stock-Level % Breakdown (Est. ~$6.5B Net Worth)</span>
+        <span class="source-chip">OGE 2026 / Forbes</span>
       </div>
-      <div class="chart-wrap"><canvas id="trumpPieChart"></canvas></div>
+      <div class="chart-wrap" style="height:320px;"><canvas id="trumpPieChart"></canvas></div>
     </div>
     <div class="card">
-      <div class="card-header"><span class="card-title">Key Holdings — Estimated % Weight</span></div>
-      <div id="holdingsPanel"></div>
+      <div class="card-header"><span class="card-title">Holdings — Estimated % of Net Worth</span></div>
+      <div id="holdingsPanel" style="max-height:400px;overflow-y:auto;"></div>
       <div style="padding:10px 16px 12px;border-top:1px solid var(--color-border);">
-        <p style="font-size:10px;color:var(--color-text-faint);line-height:1.6;">⚠️ Estimates based on OGE Form 278-T (May 2026), Forbes net worth data, DJT share price ~$7.95 (May 31, 2026 — down 42% YTD). Stock portfolio value $220M–$750M per Reuters/CNBC. TRUMP meme coin &amp; WLFI undisclosed. All percentages are approximations.</p>
+        <p style="font-size:10px;color:var(--color-text-faint);line-height:1.6;">⚠️ Estimates based on OGE Form 278-T (May 2026). Stock portfolio midpoint ~$485M split across top holdings per trade frequency &amp; OGE range midpoints. DJT: 311M shares @ $7.95 = ~$2.47B. Real estate ~$2.8B per Forbes. TRUMP meme coin &amp; WLFI undisclosed. All %s are approximations of ~$6.5B total.</p>
       </div>
     </div>
   </div>
@@ -546,20 +546,36 @@ const TRUMP_SELLS=[
   {ticker:"DJT",company:"Trump Media & Technology",value:"Partial",date:"Ongoing",note:"Minor sales, majority retained"},
 ];
 
-// ── TRUMP HOLDINGS with % of estimated ~$6.5B net worth ──
-// DJT: ~311M shares × $7.95 = ~$2.47B ≈ 38%
-// Real estate / private businesses: ~$2.8B ≈ 43%
-// Stock portfolio (Q1 2026): midpoint ~$485M ≈ 7.5%
-// WLFI (World Liberty Financial ~80% stake): ~$300–500M est. ≈ 5%
-// TRUMP meme coin: ~$200–400M est. ≈ 4%
-// Cash / bonds / other: ~$200M ≈ 3%
+// ── TRUMP HOLDINGS — STOCK-LEVEL % BREAKDOWN of ~$6.5B Est. Net Worth ──
+// Methodology:
+//   DJT: 311M shares × $7.95 = ~$2.47B → 38%
+//   Real Estate / Private Biz: Forbes ~$2.8B → 43%
+//   Stock portfolio ~$485M midpoint split by trade weight:
+//     NVDA 10 buys → ~0.9% (~$58M)   AAPL 10 buys → ~0.8% (~$52M)
+//     AMZN 11 buys → ~0.8% (~$52M)   MSFT 9 buys  → ~0.7% (~$46M)
+//     ORCL 8 buys  → ~0.6% (~$39M)   AVGO 6 buys  → ~0.5% (~$33M)
+//     NOW  6 buys  → ~0.5% (~$33M)   DELL 5 buys  → ~0.4% (~$26M)
+//     ETFs (VOO/IWB/RSP) → ~0.8% (~$52M combined)
+//     Other stocks → ~0.8% (~$52M)
+//   WLFI: ~80% stake ~$400M → 5%
+//   TRUMP Meme Coin: ~$300M → 4%
+//   Cash/Bonds: ~$200M → 3%
 const TRUMP_HOLDINGS=[
-  {color:"#f5a623",ticker:"DJT",name:"Trump Media & Tech (Truth Social)",pct:38,val:"~$2.47B",note:"311M shares @ $7.95 (down 42% YTD)"},
-  {color:"#64748b",ticker:"RE",name:"Real Estate & Private Businesses",pct:43,val:"~$2.8B",note:"Mar-a-Lago, golf courses, hotels (Forbes est.)"},
-  {color:"#4f8ef7",ticker:"STOCKS",name:"Public Stock Portfolio (Q1 2026)",pct:7,val:"~$485M",note:"$220M–$750M · 36 $1M+ buys · OGE 278-T"},
-  {color:"#06b6d4",ticker:"WLFI",name:"World Liberty Financial (DeFi)",pct:5,val:"~$400M est.",note:"~80% stake · undisclosed exact value"},
-  {color:"#f87171",ticker:"TRUMP",name:"TRUMP Meme Coin (Crypto)",pct:4,val:"~$300M est.",note:"Undisclosed · highly volatile"},
-  {color:"#34d399",ticker:"CASH",name:"Cash / Money Market / Bonds",pct:3,val:"~$200M est.",note:"SWGXX + fixed income"},
+  {color:"#f5a623",ticker:"DJT",       name:"Trump Media & Tech (Truth Social)",    pct:38,  val:"~$2.47B",  note:"311M shares @ $7.95 · down 42% YTD"},
+  {color:"#64748b",ticker:"RE/BIZ",    name:"Real Estate & Private Businesses",      pct:43,  val:"~$2.8B",   note:"Mar-a-Lago, golf courses, hotels (Forbes)"},
+  {color:"#76e3c4",ticker:"NVDA",      name:"NVIDIA Corp.",                          pct:0.9, val:"~$58M",    note:"10 buys Q1 · AI chips / Stargate"},
+  {color:"#a8b4c8",ticker:"AAPL",      name:"Apple Inc.",                            pct:0.8, val:"~$52M",    note:"10 buys Q1 · Mag-7"},
+  {color:"#f97316",ticker:"AMZN",      name:"Amazon.com Inc.",                       pct:0.8, val:"~$52M",    note:"11 buys Q1 · AWS / AI infra"},
+  {color:"#22d3ee",ticker:"MSFT",      name:"Microsoft Corp.",                       pct:0.7, val:"~$46M",    note:"9 buys Q1 · Azure / OpenAI"},
+  {color:"#f43f5e",ticker:"ORCL",      name:"Oracle Corp.",                          pct:0.6, val:"~$39M",    note:"8 buys Q1 · Stargate AI partner"},
+  {color:"#8b5cf6",ticker:"AVGO",      name:"Broadcom Inc.",                         pct:0.5, val:"~$33M",    note:"6 buys Q1 · AI custom chips"},
+  {color:"#10b981",ticker:"NOW",       name:"ServiceNow Inc.",                       pct:0.5, val:"~$33M",    note:"6 buys · +16% post-disclosure"},
+  {color:"#fbbf24",ticker:"DELL",      name:"Dell Technologies",                     pct:0.4, val:"~$26M",    note:"5 buys · AI servers"},
+  {color:"#a855f7",ticker:"ETFs",      name:"ETFs (VOO / IWB / RSP)",                pct:0.8, val:"~$52M",    note:"Broad market index funds"},
+  {color:"#6b7280",ticker:"OTHER",     name:"Other Stocks (36+ names)",              pct:0.8, val:"~$52M",    note:"BA, ETN, WDAY, SNPS, CDNS, etc."},
+  {color:"#06b6d4",ticker:"WLFI",      name:"World Liberty Financial (DeFi)",        pct:5,   val:"~$400M",   note:"~80% stake · undisclosed exact value"},
+  {color:"#f87171",ticker:"TRUMP",     name:"TRUMP Meme Coin (Crypto)",              pct:4,   val:"~$300M",   note:"Undisclosed · highly volatile"},
+  {color:"#34d399",ticker:"CASH",      name:"Cash / Money Market / Bonds",           pct:3,   val:"~$200M",   note:"SWGXX + fixed income"},
 ];
 
 const PELOSI_TRADES=[
@@ -728,7 +744,6 @@ function changePage(d){
 
 // ── TRUMP ──
 function renderTrump(){
-  // Buys table
   document.getElementById('trumpBuysBody').innerHTML=TRUMP_BUYS.map(t=>`
     <tr>
       <td class="td-ticker">${t.ticker}</td>
@@ -739,7 +754,6 @@ function renderTrump(){
       <td style="font-size:11px;color:var(--color-text-muted)">${t.note}</td>
     </tr>`).join('');
 
-  // Sells table
   document.getElementById('trumpSellsBody').innerHTML=TRUMP_SELLS.map(t=>`
     <tr>
       <td class="td-ticker">${t.ticker}</td>
@@ -749,7 +763,7 @@ function renderTrump(){
       <td style="font-size:11px;color:var(--color-text-muted)">${t.note}</td>
     </tr>`).join('');
 
-  // Holdings panel with % bars
+  // Holdings panel — stock level
   document.getElementById('holdingsPanel').innerHTML=TRUMP_HOLDINGS.map(h=>`
     <div class="holding-row">
       <div class="holding-color" style="background:${h.color}"></div>
@@ -767,7 +781,7 @@ function renderTrump(){
       </div>
     </div>`).join('');
 
-  // Pie chart — % of net worth
+  // Pie chart — stock-level breakdown
   if(charts.tp)charts.tp.destroy();
   charts.tp=new Chart(document.getElementById('trumpPieChart'),{
     type:'doughnut',
@@ -784,15 +798,24 @@ function renderTrump(){
     options:{
       responsive:true,maintainAspectRatio:false,
       plugins:{
-        legend:{position:'bottom',labels:{color:'#8892a4',font:{size:11},boxWidth:12,padding:10}},
+        legend:{
+          position:'right',
+          labels:{
+            color:'#8892a4',
+            font:{size:10},
+            boxWidth:10,
+            padding:8,
+            filter:(item)=>true
+          }
+        },
         tooltip:{callbacks:{
           label:c=>{
             const h=TRUMP_HOLDINGS[c.dataIndex];
-            return [` ${h.pct}% of net worth`,` Est. ${h.val}`];
+            return [` ${h.ticker}: ${h.pct}% of net worth`,` Est. ${h.val}`,` ${h.note}`];
           }
         }}
       },
-      cutout:'58%'
+      cutout:'50%'
     }
   });
 }
