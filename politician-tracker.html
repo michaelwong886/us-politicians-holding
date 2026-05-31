@@ -121,6 +121,13 @@ td{padding:11px 16px;font-variant-numeric:tabular-nums;white-space:nowrap;}
 .pag-btn:hover,.pag-btn.active{background:var(--color-primary-dim);border-color:var(--color-primary);color:var(--color-primary);}
 .pag-btn:disabled{opacity:0.3;cursor:default;}
 .pag-info{font-size:11px;color:var(--color-text-faint);}
+.section-tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;margin-right:6px;letter-spacing:0.5px;}
+.tag-ai{background:rgba(79,142,247,0.18);color:#4f8ef7;}
+.tag-def{background:rgba(245,166,35,0.18);color:#f5a623;}
+.tag-etf{background:rgba(168,85,247,0.18);color:#a855f7;}
+.tag-sell{background:rgba(248,113,113,0.18);color:#f87171;}
+.tag-ind{background:rgba(52,211,153,0.18);color:#34d399;}
+.tag-fin{background:rgba(100,116,139,0.18);color:#94a3b8;}
 @media(max-width:768px){
   .app{grid-template-columns:1fr;grid-template-rows:54px auto 1fr;}
   .sidebar{position:relative;height:auto;top:0;display:flex;flex-wrap:nowrap;overflow-x:auto;padding:8px;border-right:none;border-bottom:1px solid var(--color-border);}
@@ -272,35 +279,63 @@ td{padding:11px 16px;font-variant-numeric:tabular-nums;white-space:nowrap;}
     <div class="trump-avatar">🇺🇸</div>
     <div class="trump-info">
       <h2>Donald J. Trump — 47th President</h2>
-      <p>OGE Financial Disclosure · Q1 2026 · 175 transactions · Sources: CNBC, CNN, Yahoo Finance, OGE</p>
+      <p>OGE Form 278-T · Q1 2026 · 3,642 transactions · Filed May 12, 2026 · Sources: OGE, CNBC, Reuters, Yahoo Finance</p>
     </div>
     <div class="trump-stats">
-      <div class="trump-stat"><div class="val" style="color:var(--color-gold)">$51M+</div><div class="lbl">Bonds Purchased</div></div>
-      <div class="trump-stat"><div class="val" style="color:var(--color-buy)">94</div><div class="lbl">Mag-7 Trades Q1</div></div>
-      <div class="trump-stat"><div class="val" style="color:var(--color-primary)">175</div><div class="lbl">Total Transactions</div></div>
+      <div class="trump-stat"><div class="val" style="color:var(--color-gold)">$220M–$750M</div><div class="lbl">Q1 Total Value</div></div>
+      <div class="trump-stat"><div class="val" style="color:var(--color-buy)">36</div><div class="lbl">$1M+ Buys</div></div>
+      <div class="trump-stat"><div class="val" style="color:var(--color-primary)">3,642</div><div class="lbl">Total Transactions</div></div>
     </div>
   </div>
   <div class="grid-2">
     <div class="card">
-      <div class="card-header"><span class="card-title">Holdings Breakdown (est.)</span><span class="source-chip">OGE 2026</span></div>
+      <div class="card-header"><span class="card-title">Portfolio Sector Breakdown (est.)</span><span class="source-chip">OGE 2026</span></div>
       <div class="chart-wrap"><canvas id="trumpPieChart"></canvas></div>
     </div>
     <div class="card">
       <div class="card-header"><span class="card-title">Key Holdings</span></div>
       <div>
         <div class="holding-row"><div class="holding-color" style="background:#f5a623"></div><div class="holding-ticker">DJT</div><div class="holding-name">Trump Media &amp; Tech (Truth Social)</div><div class="holding-pct">~$3.5B est.</div></div>
-        <div class="holding-row"><div class="holding-color" style="background:#34d399"></div><div class="holding-ticker">BONDS</div><div class="holding-name">US Treasury / Corp Bonds</div><div class="holding-pct">$51M+</div></div>
+        <div class="holding-row"><div class="holding-color" style="background:#4f8ef7"></div><div class="holding-ticker">NVDA</div><div class="holding-name">NVIDIA Corp. (AI chips)</div><div class="holding-pct">$1M–$5M</div></div>
+        <div class="holding-row"><div class="holding-color" style="background:#34d399"></div><div class="holding-ticker">VOO</div><div class="holding-name">Vanguard S&amp;P 500 ETF</div><div class="holding-pct">$1M–$5M</div></div>
+        <div class="holding-row"><div class="holding-color" style="background:#a855f7"></div><div class="holding-ticker">NOW</div><div class="holding-name">ServiceNow Inc. (+16% post-disclosure)</div><div class="holding-pct">$1M–$5M</div></div>
         <div class="holding-row"><div class="holding-color" style="background:#f87171"></div><div class="holding-ticker">TRUMP</div><div class="holding-name">TRUMP Meme Coin (crypto)</div><div class="holding-pct">Undisclosed</div></div>
-        <div class="holding-row"><div class="holding-color" style="background:#a855f7"></div><div class="holding-ticker">WLFI</div><div class="holding-name">World Liberty Financial (DeFi)</div><div class="holding-pct">~80% stake</div></div>
+        <div class="holding-row"><div class="holding-color" style="background:#06b6d4"></div><div class="holding-ticker">WLFI</div><div class="holding-name">World Liberty Financial (DeFi)</div><div class="holding-pct">~80% stake</div></div>
       </div>
     </div>
   </div>
-  <div class="card">
-    <div class="card-header"><span class="card-title">Q1 2026 — Reported Transactions</span><span class="source-chip">OGE / CNBC / Yahoo Finance</span></div>
+
+  <!-- BUYS section -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-header">
+      <span class="card-title">✅ Q1 2026 — $1M+ Purchases (36 Trades · OGE 278-T)</span>
+      <span class="source-chip">OGE / CNBC / Reuters</span>
+    </div>
+    <div style="padding:10px 20px 6px;display:flex;gap:8px;flex-wrap:wrap;">
+      <span class="section-tag tag-ai">AI &amp; Big Tech</span>
+      <span class="section-tag tag-def">Industrials/Defense</span>
+      <span class="section-tag tag-etf">ETFs</span>
+      <span class="section-tag tag-ind">Consumer/Other</span>
+      <span class="section-tag tag-fin">Finance</span>
+    </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Ticker</th><th>Company</th><th>Type</th><th>Est. Value</th><th>Date</th><th>Note</th></tr></thead>
-        <tbody id="trumpTradesBody"></tbody>
+        <thead><tr><th>Ticker</th><th>Company</th><th>Sector Tag</th><th>Value Range</th><th>Trade Date</th><th>Note</th></tr></thead>
+        <tbody id="trumpBuysBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SELLS section -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">🔴 Q1 2026 — Major Sales (OGE 278-T)</span>
+      <span class="source-chip">OGE / CNBC</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Ticker</th><th>Company</th><th>Value Range</th><th>Trade Date</th><th>Note</th></tr></thead>
+        <tbody id="trumpSellsBody"></tbody>
       </table>
     </div>
   </div>
@@ -396,7 +431,7 @@ td{padding:11px 16px;font-variant-numeric:tabular-nums;white-space:nowrap;}
       <li><strong style="color:var(--color-gold)">45-day lag</strong> — trades are always delayed, not real-time</li>
       <li><strong style="color:var(--color-sell)">Self-reported</strong> — accuracy depends on compliance</li>
       <li><strong style="color:var(--color-text)">Amount ranges</strong> — law only requires ranges (e.g. $1,001–$15,000), not exact values</li>
-      <li><strong style="color:var(--color-primary)">Trump portfolio</strong> — based on OGE filings + CNBC/CNN/Yahoo Finance Q1 2026 reports</li>
+      <li><strong style="color:var(--color-primary)">Trump portfolio</strong> — Q1 2026 OGE Form 278-T filed May 12, 2026 · 113 pages · 3,642 transactions</li>
     </ul>
   </div>
 </section>
@@ -456,24 +491,61 @@ const CONGRESS_TRADES=[
   {rep:"Michael Burgess",party:"R",chamber:"Representatives",state:"TX",ticker:"CVS",type:"Purchase",range:"$1,001–$15,000",tradeDate:"2026-04-25",filed:"2026-05-15"},
   {rep:"Kevin Hern",party:"R",chamber:"Representatives",state:"OK",ticker:"OXY",type:"Sale",range:"$15,001–$50,000",tradeDate:"2026-03-28",filed:"2026-04-14"},
   {rep:"Steve Scalise",party:"R",chamber:"Representatives",state:"LA",ticker:"AAPL",type:"Purchase",range:"$15,001–$50,000",tradeDate:"2026-04-18",filed:"2026-05-05"},
+  {rep:"Byron Donalds",party:"R",chamber:"Representatives",state:"FL",ticker:"NOW",type:"Purchase",range:"$15,001–$50,000",tradeDate:"2026-05-10",filed:"2026-05-24"},
 ];
 
-const TRUMP_TRADES=[
-  {ticker:"AAPL",company:"Apple Inc.",type:"Purchase",value:"$1M–$5M",date:"2026-01-15",note:"Mag-7 accumulation"},
-  {ticker:"GOOGL",company:"Alphabet Inc.",type:"Purchase",value:"$1M–$5M",date:"2026-01-20",note:"Mag-7 accumulation"},
-  {ticker:"AMZN",company:"Amazon.com Inc.",type:"Purchase",value:"$1M–$5M",date:"2026-01-22",note:"Q1 tech buying"},
-  {ticker:"META",company:"Meta Platforms",type:"Purchase",value:"$500K–$1M",date:"2026-02-05",note:"Q1 tech buying"},
-  {ticker:"ORCL",company:"Oracle Corp.",type:"Purchase",value:"$500K–$1M",date:"2026-02-08",note:"Stargate AI partner"},
-  {ticker:"AVGO",company:"Broadcom Inc.",type:"Purchase",value:"$500K–$1M",date:"2026-02-10",note:"AI chip supply chain"},
-  {ticker:"MSI",company:"Motorola Solutions",type:"Purchase",value:"$250K–$500K",date:"2026-02-12",note:""},
-  {ticker:"DELL",company:"Dell Technologies",type:"Purchase",value:"$250K–$500K",date:"2026-02-14",note:"AI server demand"},
-  {ticker:"TSLA",company:"Tesla Inc.",type:"Sale",value:"$1M–$5M",date:"2026-01-28",note:"Musk relationship shift"},
-  {ticker:"NFLX",company:"Netflix Inc.",type:"Purchase",value:"$250K–$500K",date:"2026-01-12",note:"Post NFLX-WBD deal"},
-  {ticker:"WBD",company:"Warner Bros. Discovery",type:"Purchase",value:"$100K–$250K",date:"2026-01-12",note:"Post NFLX-WBD deal"},
-  {ticker:"DJT",company:"Trump Media & Technology",type:"Hold",value:"~$3.5B est.",date:"Ongoing",note:"Majority stake"},
-  {ticker:"T-Bonds",company:"US Treasury / Corp Bonds",type:"Purchase",value:"$51M+",date:"2025-Q4",note:"Fixed income shift"},
-  {ticker:"MSFT",company:"Microsoft Corp.",type:"Purchase",value:"$500K–$1M",date:"2026-03-01",note:"Azure / AI"},
-  {ticker:"COIN",company:"Coinbase Global",type:"Purchase",value:"$100K–$250K",date:"2026-02-20",note:"Crypto policy alignment"},
+// Trump Q1 2026 OGE Buys — full $1M+ list
+const TRUMP_BUYS=[
+  // AI & Big Tech
+  {ticker:"NVDA",company:"NVIDIA Corp.",tag:"ai",value:"$1M–$5M",date:"2026-02-10",note:"AI chips / Stargate"},
+  {ticker:"AAPL",company:"Apple Inc.",tag:"ai",value:"$1M–$5M",date:"2026-03-02",note:"Mag-7 accumulation"},
+  {ticker:"MSFT",company:"Microsoft Corp.",tag:"ai",value:"$1M–$5M",date:"2026-03-19",note:"Azure / OpenAI"},
+  {ticker:"AMZN",company:"Amazon.com Inc.",tag:"ai",value:"$1M–$5M",date:"2026-03-19",note:"AWS / AI infra"},
+  {ticker:"ORCL",company:"Oracle Corp.",tag:"ai",value:"$1M–$5M",date:"2026-03-17",note:"Stargate AI partner"},
+  {ticker:"AVGO",company:"Broadcom Inc.",tag:"ai",value:"$1M–$5M",date:"2026-02-10",note:"AI custom chips / ASIC"},
+  {ticker:"ADBE",company:"Adobe Inc.",tag:"ai",value:"$1M–$5M",date:"2026-02-10",note:"AI creative suite"},
+  {ticker:"NOW",company:"ServiceNow Inc.",tag:"ai",value:"$1M–$5M",date:"2026-02-10",note:"🔥 Stock +16% post-disclosure"},
+  {ticker:"WDAY",company:"Workday Inc.",tag:"ai",value:"$1M–$5M",date:"2026-02-10",note:"AI enterprise HR/Finance"},
+  {ticker:"SNPS",company:"Synopsys Inc.",tag:"ai",value:"$1M–$5M",date:"2026-02-10",note:"EDA / chip design tools"},
+  {ticker:"CDNS",company:"Cadence Design Sys.",tag:"ai",value:"$1M–$5M",date:"2026-03-17",note:"EDA / chip design tools"},
+  {ticker:"CDW",company:"CDW Corp.",tag:"ai",value:"$1M–$5M",date:"2026-02-10",note:"IT solutions / gov't contracts"},
+  {ticker:"CMCSA",company:"Comcast Corp.",tag:"ai",value:"$1M–$5M",date:"2026-01-12",note:"Media / broadband"},
+  {ticker:"PTC",company:"PTC Inc.",tag:"ai",value:"$1M–$5M",date:"2026-02-10",note:"Industrial IoT / SaaS"},
+  {ticker:"TXN",company:"Texas Instruments",tag:"ai",value:"$1M–$5M",date:"2026-01-12",note:"Analog semiconductors"},
+  {ticker:"MSI",company:"Motorola Solutions",tag:"ai",value:"$1M–$5M",date:"2026-02-10",note:"Gov't / public safety tech"},
+  {ticker:"FIS",company:"Fidelity Natl. Info. Svcs.",tag:"fin",value:"$1M–$5M",date:"2026-01-12",note:"Fintech / payments"},
+  // Industrials & Defense
+  {ticker:"BA",company:"Boeing Co.",tag:"def",value:"$1M–$5M",date:"2026-02-10",note:"Defense / aerospace"},
+  {ticker:"ETN",company:"Eaton Corp.",tag:"def",value:"$1M–$5M",date:"2026-03-17",note:"Power mgmt / data centers"},
+  {ticker:"TT",company:"Trane Technologies",tag:"def",value:"$1M–$5M",date:"2026-03-17",note:"HVAC / energy efficiency"},
+  {ticker:"TDG",company:"TransDigm Group",tag:"def",value:"$1M–$5M",date:"2026-02-10",note:"Aerospace components"},
+  // Consumer & Other
+  {ticker:"PG",company:"Procter & Gamble",tag:"ind",value:"$1M–$5M",date:"2026-01-12",note:"Consumer staples"},
+  {ticker:"COST",company:"Costco Wholesale",tag:"ind",value:"$1M–$5M",date:"2026-02-10",note:"Retail"},
+  {ticker:"UBER",company:"Uber Technologies",tag:"ind",value:"$1M–$5M",date:"2026-03-17",note:"Autonomous / AI transport"},
+  {ticker:"DELL",company:"Dell Technologies",tag:"ai",value:"$1M–$5M",date:"2026-02-10",note:"AI servers · praised at WH May 8"},
+  {ticker:"JBL",company:"Jabil Inc.",tag:"ind",value:"$1M–$5M",date:"2026-02-10",note:"Electronics manufacturing"},
+  {ticker:"AXON",company:"Axon Enterprise",tag:"def",value:"$1M–$5M",date:"2026-02-10",note:"Law enforcement tech"},
+  {ticker:"KRUS",company:"Kura Sushi USA",tag:"ind",value:"$1M–$5M",date:"2026-02-02",note:"Restaurant / consumer"},
+  // ETFs & Funds
+  {ticker:"VOO",company:"Vanguard S&P 500 ETF",tag:"etf",value:"$1M–$5M",date:"2026-02-13 / 03-02",note:"Broad market"},
+  {ticker:"IWB",company:"iShares Russell 1000",tag:"etf",value:"$1M–$5M",date:"2026-03-27",note:"Large-cap US"},
+  {ticker:"RSP",company:"Invesco S&P 500 Equal Wt.",tag:"etf",value:"$1M–$5M",date:"2026-02-20",note:"Equal-weight S&P"},
+  {ticker:"XLI",company:"SPDR Industrial ETF",tag:"etf",value:"$1M–$5M",date:"2026-01-29",note:"Industrials sector"},
+  {ticker:"COMT",company:"iShares GSCI Commodity",tag:"etf",value:"$1M–$5M",date:"2026-03-05",note:"Commodities"},
+  {ticker:"IEMG",company:"iShares Emerging Mkts.",tag:"etf",value:"$1M–$5M",date:"2026-01-29",note:"EM exposure (3x buys)"},
+  {ticker:"SWGXX",company:"Schwab Govt Money Fund",tag:"fin",value:"$1M–$5M",date:"2026-03-17",note:"Cash / money market"},
+  {ticker:"MARA",company:"MARA Holdings",tag:"ai",value:"$500K–$1M",date:"2026-01-15",note:"Bitcoin mining"},
+];
+
+// Trump Q1 2026 Major Sells
+const TRUMP_SELLS=[
+  {ticker:"MSFT",company:"Microsoft Corp.",value:"$5M–$25M",date:"2026-02-10",note:"Largest single sell"},
+  {ticker:"AMZN",company:"Amazon.com Inc.",value:"$5M–$25M",date:"2026-02-10",note:"Same-day rotation"},
+  {ticker:"META",company:"Meta Platforms",value:"$5M–$25M",date:"2026-02-10",note:"Sold then later re-bought"},
+  {ticker:"NFLX",company:"Netflix Inc.",value:"$1M–$5M",date:"2026-02-10",note:"Profit taking"},
+  {ticker:"PLTR",company:"Palantir Technologies",value:"$1M–$5M",date:"2026-02-10",note:"Reduced AI Gov position"},
+  {ticker:"DJT",company:"Trump Media & Technology",value:"Partial",date:"Ongoing",note:"Minor sales, majority retained"},
 ];
 
 const PELOSI_TRADES=[
@@ -507,6 +579,7 @@ const POLITICIANS_SUMMARY=[
   {name:"Suzan DelBene",party:"D",chamber:"Representatives",state:"WA",trades2026:5,lastTrade:"2026-04-08",topTicker:"MSFT"},
   {name:"Ro Khanna",party:"D",chamber:"Representatives",state:"CA",trades2026:4,lastTrade:"2026-03-05",topTicker:"NVDA"},
   {name:"Lois Frankel",party:"D",chamber:"Representatives",state:"FL",trades2026:4,lastTrade:"2026-05-20",topTicker:"AAPL"},
+  {name:"Byron Donalds",party:"R",chamber:"Representatives",state:"FL",trades2026:3,lastTrade:"2026-05-24",topTicker:"NOW"},
 ];
 
 const HOT_TICKERS=[
@@ -514,6 +587,7 @@ const HOT_TICKERS=[
   {ticker:"AAPL",company:"Apple Inc.",buys:12,sells:2,sector:"Technology"},
   {ticker:"MSFT",company:"Microsoft Corp.",buys:9,sells:4,sector:"Technology"},
   {ticker:"AMZN",company:"Amazon.com",buys:9,sells:1,sector:"Technology"},
+  {ticker:"NOW",company:"ServiceNow Inc.",buys:8,sells:0,sector:"Technology"},
   {ticker:"GOOGL",company:"Alphabet Inc.",buys:8,sells:2,sector:"Technology"},
   {ticker:"META",company:"Meta Platforms",buys:6,sells:3,sector:"Technology"},
   {ticker:"XOM",company:"Exxon Mobil",buys:5,sells:3,sector:"Energy"},
@@ -524,7 +598,6 @@ const HOT_TICKERS=[
   {ticker:"CVX",company:"Chevron Corp.",buys:4,sells:2,sector:"Energy"},
   {ticker:"LLY",company:"Eli Lilly",buys:5,sells:1,sector:"Healthcare"},
   {ticker:"COIN",company:"Coinbase",buys:4,sells:0,sector:"Crypto/Finance"},
-  {ticker:"NFLX",company:"Netflix Inc.",buys:3,sells:1,sector:"Media"},
 ];
 
 // ── STATE ──
@@ -560,6 +633,11 @@ function avatarBg(name){
   return colors[h];
 }
 function initials(name){return name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();}
+function tagBadge(tag){
+  const map={ai:['tag-ai','AI/Tech'],def:['tag-def','Industrial/Def'],etf:['tag-etf','ETF'],ind:['tag-ind','Consumer'],fin:['tag-fin','Finance']};
+  const [cls,lbl]=map[tag]||['tag-fin','Other'];
+  return `<span class="section-tag ${cls}">${lbl}</span>`;
+}
 
 // ── DASHBOARD ──
 function renderDashboard(){
@@ -636,16 +714,48 @@ function changePage(d){
 
 // ── TRUMP ──
 function renderTrump(){
-  document.getElementById('trumpTradesBody').innerHTML=TRUMP_TRADES.map(t=>`
+  // Buys table
+  document.getElementById('trumpBuysBody').innerHTML=TRUMP_BUYS.map(t=>`
     <tr>
-      <td class="td-ticker">${t.ticker}</td><td style="font-size:12px">${t.company}</td>
-      <td>${typeBadge(t.type==='Hold'?'Purchase':t.type)}</td>
+      <td class="td-ticker">${t.ticker}</td>
+      <td style="font-size:12px">${t.company}</td>
+      <td>${tagBadge(t.tag)}</td>
       <td class="td-amount" style="font-size:12px">${t.value}</td>
       <td class="td-date">${t.date}</td>
       <td style="font-size:11px;color:var(--color-text-muted)">${t.note}</td>
     </tr>`).join('');
+
+  // Sells table
+  document.getElementById('trumpSellsBody').innerHTML=TRUMP_SELLS.map(t=>`
+    <tr>
+      <td class="td-ticker">${t.ticker}</td>
+      <td style="font-size:12px">${t.company}</td>
+      <td><span class="badge badge-sell">${t.value}</span></td>
+      <td class="td-date">${t.date}</td>
+      <td style="font-size:11px;color:var(--color-text-muted)">${t.note}</td>
+    </tr>`).join('');
+
+  // Pie chart
   if(charts.tp)charts.tp.destroy();
-  charts.tp=new Chart(document.getElementById('trumpPieChart'),{type:'doughnut',data:{labels:['DJT/Trump Media','Mag-7 Stocks','Bonds','Crypto/DeFi','Other'],datasets:[{data:[52,25,12,7,4],backgroundColor:['rgba(245,166,35,0.8)','rgba(79,142,247,0.8)','rgba(52,211,153,0.7)','rgba(168,85,247,0.8)','rgba(100,116,139,0.6)'],borderWidth:1.5,hoverOffset:10}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8892a4',font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw}%`}}},cutout:'60%'}});
+  charts.tp=new Chart(document.getElementById('trumpPieChart'),{
+    type:'doughnut',
+    data:{
+      labels:['DJT/Trump Media','AI & Big Tech','ETFs (VOO/IWB/RSP)','Industrials/Defense','Crypto/DeFi','Finance/Other'],
+      datasets:[{
+        data:[48,28,10,7,4,3],
+        backgroundColor:['rgba(245,166,35,0.85)','rgba(79,142,247,0.85)','rgba(168,85,247,0.8)','rgba(245,166,35,0.5)','rgba(248,113,113,0.8)','rgba(100,116,139,0.6)'],
+        borderWidth:1.5,hoverOffset:10
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'bottom',labels:{color:'#8892a4',font:{size:11},boxWidth:12}},
+        tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw}%`}}
+      },
+      cutout:'60%'
+    }
+  });
 }
 
 // ── PELOSI ──
